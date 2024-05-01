@@ -1,27 +1,30 @@
+import 'package:budget_odc/theme/couleur.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OnBoardingState extends StatelessWidget {
   OnBoardingState({
     Key? key,
-    required this.title,
-    required this.desc,
-    required this.imageURL,
+    required this.titre,
+    required this.sousTitre,
+    required this.description,
+    required this.image,
   }) : super(key: key);
-  final String title;
-  final String desc;
-  final String imageURL;
+  final String titre;
+  final String sousTitre;
+  final String description;
+  final String image;
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
           height: 34,
         ),
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 24.0),
+          padding: EdgeInsets.symmetric(vertical: 0.0),
           child: Image.asset(
-            imageURL,
+            image,
             width: double.infinity,
             height: 200,
           ),
@@ -29,38 +32,34 @@ class OnBoardingState extends StatelessWidget {
         SizedBox(
           height: 8,
         ),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-          ),
-          child: Column(
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                title,
-                textAlign: TextAlign.center,
+                titre,
+                // textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 26,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Color(0xff023020),
                 ),
               ),
+              Text(sousTitre,style: TextStyle(color: orange, fontSize: 26,
+                  fontWeight: FontWeight.bold,),),
               SizedBox(
                 height: 10,
               ),
+              
               Text(
-                desc,
-                textAlign: TextAlign.center,
+                description,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   color: Colors.grey,
                 ),
               ),
             ],
           ),
-        ),
+      
       ],
     );
   }

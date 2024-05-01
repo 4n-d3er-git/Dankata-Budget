@@ -3,7 +3,6 @@ import 'package:budget_odc/Page/onBoarding/on_boardingdot.dart';
 import 'package:budget_odc/Page/onBoarding/on_boardingstate.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OnBoardingPage extends StatefulWidget {
   @override
@@ -13,135 +12,142 @@ class OnBoardingPage extends StatefulWidget {
 class _OnBoardingPageState extends State<OnBoardingPage> {
   int currentIndex = 0;
 
-  List<Map<String, String>> items = [
+  List<Map<String, String>> items = [   
     {
-      "title": "sdqgfsshqhd",
-      "desc": "sldqhjhsqpsdmqsdsdsqddsssqd.",
-      "imageURL": "assets/images/on1.png",
+      "titre": "Commencez avec la",
+      "sousTitre": "Budgetisateion Basée sur le Revenu",
+      "description": "Une methode de gestion de vos finances en organisant vos dépensen en catégories spécifiqueq.",
+      "image": "assets/images/on1.png",
     },
     {
-      "title": "shdhgdfjsjgdjgdjds",
-      "desc": "gfsjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",
-      "imageURL": "assets/images/on2.png",
+      "titre": "Continuez à mettre à jour vos revenus",
+      "sousTitre": "avec un budget avantageux",
+      "description": "La mise en oeuvre de stratégies respectueuses du budget, vous pouvez tirer le meilleur"
+      " parti de vos resources financières et atteindre vos obgetifs financières plus facilement.",
+      "image": "assets/images/on3.png",
     },
     {
-      "title": "sfykhhhhhhhhhhhhhhhhhhhhhhhh",
-      "desc": "dghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh.",
-      "imageURL": "assets/images/on3.png",
+      "titre": "Continuze à mettre à jour vos dépenses",
+      "sousTitre": "avec notre applications",
+      "description": "En examinant et en optimisant régulièrement vos dépenses, vous pouvez vous assurer."
+      "que vous tirez le meilleur parti de vos ressources financières et que  vous restez sur la bonne voie avec"
+      "vos style de vie repectueux de votre budget.",
+      "image": "assets/images/on2.png",
     },
   ];
+  final PageController  _pageController = PageController(initialPage: 0);
 
+  bool dernierePage = false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: SizedBox(
-          width: double.infinity,
-          child: Column(
-            children: [
-              SizedBox(
-                  // height: 1 ,
-                  ),
-              Expanded(
-                flex: 3,
-                child: PageView.builder(
-                  onPageChanged: (value) {
-                    setState(() {
-                      currentIndex = value;
-                    });
-                  },
-                  itemCount: items.length,
-                  itemBuilder: (context, index) => OnBoardingState(
-                    title: items[index]["title"].toString(),
-                    desc: items[index]["desc"].toString(),
-                    imageURL: items[index]["imageURL"].toString(),
+        body: Padding(
+          padding: const EdgeInsets.only(left:5.0, right: 5),
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+               
+                Expanded(
+                  flex: 3,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: (value) {
+                      setState(() {
+                        currentIndex = value;
+                        dernierePage = (value ==2);
+                      });
+                    },
+                    itemCount: items.length,
+                    itemBuilder: (context, index) => OnBoardingState(
+                      titre: items[index]["titre"].toString(),
+                      sousTitre: items[index]["sousTitre"].toString(),
+                      description: items[index]["description"].toString(),
+                      image: items[index]["image"].toString(),
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    Spacer(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        items.length,
-                        (index) => OnBoardingDot(
-                            index: index, currentIndex: currentIndex),
+                Expanded(
+                  flex: 1,
+                  child: Column(
+                    children: [
+                      Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: List.generate(
+                          items.length,
+                          (index) => OnBoardingDot(
+                              index: index, currentIndex: currentIndex),
+                        ),
                       ),
-                    ),
-                    Spacer(
-                      flex: 3,
-                    ),
-                    currentIndex == 4
-                        ? Container()
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                  onPressed: () {},
-                                  icon: Icon(Icons.arrow_back)),
-                              Container(
-                                margin: EdgeInsets.only(right: 5),
-                                height: 40,
-                                decoration: BoxDecoration(color: vert),
-                                child: TextButton(
-                                  onPressed: () {},
-                                  child: Text(
-                                    "Sauter",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 16,
+                      SizedBox(height: 15,),
+                       Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                    onPressed: () {
+                                      _pageController.previousPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeIn,
+                                      );
+                                      },
+                                    icon: Icon(Icons.arrow_back_outlined)),
+
+                                    dernierePage ?
+                                    
+                                Container(
+                                  margin: EdgeInsets.only(right: 5),
+                                  height: 40,
+                                  decoration: BoxDecoration(color: vert),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => Inscription()));
+                                                                        },
+                                    child: Text(
+                                      "Créer un compte",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ):
+                                Container(
+                                  margin: EdgeInsets.only(right: 5),
+                                  height: 40,
+                                  decoration: BoxDecoration(color: vert),
+                                  child: TextButton(
+                                    onPressed: () {
+                                      _pageController.nextPage(
+                                        duration: Duration(milliseconds: 300),
+                                        curve: Curves.easeIn,
+                                      );
+                                                                        },
+                                    child: Text(
+                                      "Suivant",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: 20),
-                      child: currentIndex == 2
-                          ? MaterialButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Inscription()));
-                              },
-                              child: Text("Créer un Compte"),
-                            )
-                          : SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  shadowColor: Colors.green[900],
-                                  shape: StadiumBorder(),
-                                  padding: EdgeInsets.all(12),
-                                  minimumSize: Size(double.infinity, 40),
-                                ),
-                                onPressed: null,
-                                child: Text(
-                                  "Créer un Compte",
-                                  style: TextStyle(
-                                    color:
-                                        const Color.fromRGBO(255, 255, 255, 1),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
+                              ],
                             ),
-                    ),
-                    Spacer(),
-                  ],
+                      SizedBox(
+                        height: 5,
+                      ),
+                      
+                      Spacer(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
