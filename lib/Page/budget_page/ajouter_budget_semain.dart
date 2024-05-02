@@ -65,11 +65,7 @@ for (int i = 0; i < _nombreDeCategories; i++) {
       jours.add(nobreCat);
     }
       final donneesRevenu = {
-        // // 'plagedate': plageChoisi,
-        // 'description': description.toString(),
-        // 'nombre': nobreCat,
-        // 'montant': montant.toString(),
-        // 'email': userEmail
+       
         'plagedate': {
           'start': plageChoisi.start,
           'end': plageChoisi.end,
@@ -251,7 +247,7 @@ print("Nombre de nombreCat: ${montant.length}");
                     borderRadius: BorderRadius.circular(10),
                   ),
                   onPressed: () {
-                    if (_nombreDeCategorieController.text.isEmpty) {
+                    if (_nombreDeCategorieController.text.isEmpty) { 
                       montrerSnackBar(
                           "veuillez entrer le nombre de catégorie", context);
                     } else if (_descriptionDesCategories.isEmpty) {

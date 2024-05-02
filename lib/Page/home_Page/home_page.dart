@@ -33,78 +33,160 @@ class _HomePageState extends State<HomePage>
 
   // Calculer les revenus de l'utilisateur actuel
 
-  Stream<double> calculerRevenusUtilisateur(String email) {
-    return FirebaseFirestore.instance
-        .collection('transaction')
-        .where('email', isEqualTo: email) 
-        .where('type', isEqualTo: 'revenu')
-        // Filtrer par e-mail de l'utilisateur
-        .snapshots()
-        .map((querySnapshot) {
-      double totalRevenus = 0;
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data()!; // Vérification null
-        double? montant = data['montant']; // Vérification null
+  // Stream<double> calculerRevenusUtilisateur(String email) {
+  //   return FirebaseFirestore.instance
+  //       .collection('transaction')
+  //       .where('email', isEqualTo: email) 
+  //       .where('type', isEqualTo: 'revenu')
+  //       // Filtrer par e-mail de l'utilisateur
+  //       .snapshots()
+  //       .map((querySnapshot) {
+  //     double totalRevenus = 0;
+  //     querySnapshot.docs.forEach((doc) {
+  //       Map<String, dynamic> data = doc.data()!; // Vérification null
+  //       double? montant = data['montant']; // Vérification null
+  //       if (montant != null) {
+  //         totalRevenus += montant;
+  //       }
+  //     });
+  //     return totalRevenus;
+  //   });
+  // }
+Stream<double> calculerRevenusUtilisateur(String email, DateTime? startDate, DateTime? endDate) {
+  Query transactionsQuery = FirebaseFirestore.instance
+      .collection('transaction')
+      .where('email', isEqualTo: email)
+      .where('type', isEqualTo: 'revenu');
+
+  if (startDate != null && endDate != null) {
+    transactionsQuery = transactionsQuery
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate);
+  }
+
+  return transactionsQuery.snapshots().map((querySnapshot) {
+    double totalRevenus = 0;
+    querySnapshot.docs.forEach((doc) {
+      // Vérifier si les données ne sont pas null
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>; // Cast sécurisé
+        double? montant = data['montant'] as double?; // Vérification null
         if (montant != null) {
           totalRevenus += montant;
         }
-      });
-      return totalRevenus;
+      }
     });
+    return totalRevenus;
+  });
+}
+  //----------------------------------------------------------
+  // Stream<double> calculerDepensesUtilisateur(String email) {
+  //   return FirebaseFirestore.instance
+  //       .collection('transaction')
+  //       .where('email', isEqualTo: email) // Filtrer par e-mail de l'utilisateur
+  //       .where('type', isEqualTo: 'depense')
+  //       .snapshots()
+  //       .map((querySnapshot) {
+  //     double totalDepenses = 0;
+  //     querySnapshot.docs.forEach((doc) {
+  //       Map<String, dynamic> data = doc.data()!; // Vérification null
+  //       double? montant = data['montant']; // Vérification null
+  //       if (montant != null) {
+  //         totalDepenses += montant;
+  //       }
+  //     });
+  //     return totalDepenses;
+  //   });
+  // }
+
+  Stream<double> calculerDepensesUtilisateur(String email, DateTime? startDate, DateTime? endDate) {
+  Query transactionsQuery = FirebaseFirestore.instance
+      .collection('transaction')
+      .where('email', isEqualTo: email)
+      .where('type', isEqualTo: 'depense');
+
+  if (startDate != null && endDate != null) {
+    transactionsQuery = transactionsQuery
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate);
   }
 
-  //----------------------------------------------------------
-  Stream<double> calculerDepensesUtilisateur(String email) {
-    return FirebaseFirestore.instance
-        .collection('transaction')
-        .where('email', isEqualTo: email) // Filtrer par e-mail de l'utilisateur
-        .where('type', isEqualTo: 'depense')
-        .snapshots()
-        .map((querySnapshot) {
-      double totalDepenses = 0;
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data()!; // Vérification null
-        double? montant = data['montant']; // Vérification null
+  return transactionsQuery.snapshots().map((querySnapshot) {
+    double totalDepenses = 0;
+    querySnapshot.docs.forEach((doc) {
+      // Vérifier si les données ne sont pas null
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>; // Cast sécurisé
+        double? montant = data['montant'] as double?; // Vérification null
         if (montant != null) {
           totalDepenses += montant;
         }
-      });
-      return totalDepenses;
+      }
     });
-  }
+    return totalDepenses;
+  });
+}
+
 
   //-------------------------------------------------
   // Calculer le solde actuel de l'utilisateur actuel
   Future<double> calculerSoldeUtilisateur(String email) async {
     double solde = 0;
-    double revenus = await calculerRevenusUtilisateur(email).first;
-    double depenses = await calculerDepensesUtilisateur(email).first;
-    double epargne = await calculerDepensesUtilisateur(email).first;
+    double revenus = await calculerRevenusUtilisateur(email, _startDate, _endDate).first;
+    double depenses = await calculerDepensesUtilisateur(email, _startDate, _endDate).first;
+    double epargne = await calculerEpargneUtilisateur(email, _startDate, _endDate).first;
 
 
     solde = revenus - (depenses + epargne);
     return solde;
   }
   //! ------------------------------------------------------------
-  
-  Stream<double> calculerEpargneUtilisateur(String email) {
-    return FirebaseFirestore.instance
-        .collection('transaction')
-        .where('email', isEqualTo: email) // Filtrer par e-mail de l'utilisateur
-        .where('type', isEqualTo: 'epargne')
-        .snapshots()
-        .map((querySnapshot) {
-      double totalEpargnes = 0;
-      querySnapshot.docs.forEach((doc) {
-        Map<String, dynamic> data = doc.data()!; // Vérification null
-        double? montant = data['montant']; // Vérification null
+  Stream<double> calculerEpargneUtilisateur(String email, DateTime? startDate, DateTime? endDate) {
+  Query transactionsQuery = FirebaseFirestore.instance
+      .collection('transaction')
+      .where('email', isEqualTo: email)
+      .where('type', isEqualTo: 'epargne');
+
+  if (startDate != null && endDate != null) {
+    transactionsQuery = transactionsQuery
+        .where('date', isGreaterThanOrEqualTo: startDate)
+        .where('date', isLessThanOrEqualTo: endDate);
+  }
+
+  return transactionsQuery.snapshots().map((querySnapshot) {
+    double totalEpargnes = 0;
+    querySnapshot.docs.forEach((doc) {
+      // Vérifier si les données ne sont pas null
+      if (doc.exists && doc.data() != null) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>; // Cast sécurisé
+        double? montant = data['montant'] as double?; // Vérification null
         if (montant != null) {
           totalEpargnes += montant;
         }
-      });
-      return totalEpargnes;
+      }
     });
-  }
+    return totalEpargnes;
+  });
+}
+
+  // Stream<double> calculerEpargneUtilisateur(String email) {
+  //   return FirebaseFirestore.instance
+  //       .collection('transaction')
+  //       .where('email', isEqualTo: email) // Filtrer par e-mail de l'utilisateur
+  //       .where('type', isEqualTo: 'epargne')
+  //       .snapshots()
+  //       .map((querySnapshot) {
+  //     double totalEpargnes = 0;
+  //     querySnapshot.docs.forEach((doc) {
+  //       Map<String, dynamic> data = doc.data()!; // Vérification null
+  //       double? montant = data['montant']; // Vérification null
+  //       if (montant != null) {
+  //         totalEpargnes += montant;
+  //       }
+  //     });
+  //     return totalEpargnes;
+  //   });
+  // }
 
   //  Future<double> calculerPourcentage(String email) async{
   //   double pourcentage = 0;
@@ -115,6 +197,54 @@ class _HomePageState extends State<HomePage>
   //   pourcentage =pourcentageRevenus - pourcentageDepenses;
   //   return pourcentage;
   //  }
+
+          DateTime? _startDate;
+  DateTime? _endDate;
+  DateTimeRange plageChoisi =
+      DateTimeRange(start: DateTime.now(), end: DateTime.now());
+
+Future<QuerySnapshot> _filtreRevenu() async {
+    Query transactionsQuery = FirebaseFirestore.instance
+        .collection('transaction')
+        .where('type', isEqualTo: 'revenu')
+        .where('email', isEqualTo: currUserEmail);
+
+    if (_startDate != null && _endDate != null) {
+      transactionsQuery = transactionsQuery
+          .where('date', isGreaterThanOrEqualTo: _startDate)
+          .where('date', isLessThanOrEqualTo: _endDate);
+    }
+
+    return await transactionsQuery.get();
+  } 
+  Future<QuerySnapshot> _filtreDepense() async {
+    Query transactionsQuery = FirebaseFirestore.instance
+        .collection('transaction')
+        .where('type', isEqualTo: 'depense')
+        .where('email', isEqualTo: currUserEmail);
+
+    if (_startDate != null && _endDate != null) {
+      transactionsQuery = transactionsQuery
+          .where('date', isGreaterThanOrEqualTo: _startDate)
+          .where('date', isLessThanOrEqualTo: _endDate);
+    }
+
+    return await transactionsQuery.get();
+  } 
+  Future<QuerySnapshot> _filtreEpargne() async {
+    Query transactionsQuery = FirebaseFirestore.instance
+        .collection('transaction')
+        .where('type', isEqualTo: 'epargne')
+        .where('email', isEqualTo: currUserEmail);
+
+    if (_startDate != null && _endDate != null) {
+      transactionsQuery = transactionsQuery
+          .where('date', isGreaterThanOrEqualTo: _startDate)
+          .where('date', isLessThanOrEqualTo: _endDate);
+    }
+
+    return await transactionsQuery.get();
+  } 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -140,6 +270,29 @@ class _HomePageState extends State<HomePage>
                 ),
               ],
             ),
+            actions: [Container(
+              margin: EdgeInsets.symmetric(horizontal: 4),
+            height: 35,
+            width: 35,
+            decoration: BoxDecoration(
+                color: vert, borderRadius: BorderRadius.circular(50)),
+              child: IconButton(onPressed: ()async {
+                    final picked = await showDateRangePicker(
+                  context: context,
+                  firstDate: DateTime(2024),
+                  lastDate: DateTime(2030),
+                  initialDateRange: _startDate != null && _endDate != null
+                      ? DateTimeRange(start: _startDate!, end: _endDate!)
+                      : null,
+                );
+                if (picked != null && picked.start != null && picked.end != null) {
+                  setState(() {
+                    _startDate = picked.start;
+                    _endDate = picked.end;
+                  });
+                }
+                  }, icon: Icon(Icons.filter_list, color: Colors.white,)),
+            )],
           ),
           body:
               //   FutureBuilder<QuerySnapshot>(
@@ -188,7 +341,7 @@ class _HomePageState extends State<HomePage>
                 child: Row(
                   children: [
                     StreamBuilder<double>(
-                        stream: calculerRevenusUtilisateur(currUserEmail!),
+                        stream: calculerRevenusUtilisateur(currUserEmail!, _startDate, _endDate),
                         builder: (BuildContext context,
                             AsyncSnapshot<double> snapshot) {
                           if (snapshot.connectionState ==
@@ -269,7 +422,7 @@ class _HomePageState extends State<HomePage>
                     //   },
                     // ),
                     StreamBuilder<double>(
-                        stream: calculerDepensesUtilisateur(currUserEmail!),
+                        stream: calculerDepensesUtilisateur(currUserEmail!, _startDate, _endDate),
                         builder: (BuildContext context,
                             AsyncSnapshot<double> snapshot) {
                           if (snapshot.connectionState ==
@@ -383,7 +536,7 @@ class _HomePageState extends State<HomePage>
                     ),
                     // Carte2(stitre: '00', balance: false),
                     StreamBuilder<double>(
-                        stream: calculerEpargneUtilisateur(currUserEmail!),
+                        stream: calculerEpargneUtilisateur(currUserEmail!, _startDate, _endDate),
                         builder: (BuildContext context,
                             AsyncSnapshot<double> snapshot) {
                           if (snapshot.connectionState ==
@@ -493,14 +646,15 @@ class _HomePageState extends State<HomePage>
               ),
               TabBar(
                 tabs: [
+                  
                   Tab(
-                    text: "Toutes les Transactions",
+                    text: "Revenus",
                   ),
                   Tab(
-                    text: "Revenu",
+                    text: "Dépenses",
                   ),
                   Tab(
-                    text: "Dépense",
+                    text: "Epargnes"
                   )
                 ],
                 indicatorColor: vertBackground,
@@ -511,73 +665,10 @@ class _HomePageState extends State<HomePage>
                   height: 200,
                   child: TabBarView(
                     children: [
-                      FutureBuilder<QuerySnapshot>(
-                          future:
-                              // _fetchData(),
-                              FirebaseFirestore.instance
-                                  .collection('transaction')
-                                  .where('email', isEqualTo: currUserEmail)
-                                  .get(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return Text("Error : ${snapshot.error}");
-                            }
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            }
-                            if (!snapshot.hasData ||
-                                snapshot.data!.docs.isEmpty) {
-                              return const Text("No data found");
-                            }
-                            final userData = snapshot.data!.docs;
-                            return ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: userData.length,
-                                itemBuilder: (context, index) {
-                                  final userDataFields = userData[index];
-
-                                  final montant = userDataFields['montant'];
-                                  final categorie =
-                                      userDataFields['category'] as String? ??
-                                          '';
-                                  final compte =
-                                      userDataFields['compte'] as String? ?? '';
-
-                                  final date = userDataFields['date'];
-
-                                  return ListTile(
-                                    subtitle: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(compte),
-                                        // Text("$date"),
-                                      ],
-                                    ),
-                                    trailing: Text(
-                                      "$montant",
-                                      style:
-                                          TextStyle(color: vert, fontSize: 16),
-                                    ),
-                                    title: Text(
-                                      categorie,
-                                      style: TextStyle(
-                                          color: vert,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  );
-                                });
-                          }),
+                      
                       //! Revenu
                       FutureBuilder<QuerySnapshot>(
-                          future:
-                              // _fetchData(),
-                              FirebaseFirestore.instance
-                                  .collection('transaction')
-                                  .where('type', isEqualTo: 'revenu')
-                                  .where('email', isEqualTo: currUserEmail)
-                                  .get(),
+                          future:_filtreRevenu(),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return Text("Error : ${snapshot.error}");
@@ -635,13 +726,8 @@ class _HomePageState extends State<HomePage>
                       // ),
                       //! DEPENSE
                       FutureBuilder<QuerySnapshot>(
-                          future:
-                              // _fetchData(),
-                              FirebaseFirestore.instance
-                                  .collection('transaction')
-                                  .where('type', isEqualTo: 'depense')
-                                  .where('email', isEqualTo: currUserEmail)
-                                  .get(),
+                          future:_filtreDepense(),
+                              
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return Text("Error : ${snapshot.error}");
@@ -697,162 +783,61 @@ class _HomePageState extends State<HomePage>
                       //     child: Text("Dépense"),
                       //   ),
                       // ),
+                      // ! Epargne
+                      FutureBuilder<QuerySnapshot>(
+                          future: _filtreEpargne(),
+                              // _fetchData(),
+                             
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Text("Error : ${snapshot.error}");
+                            }
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            }
+                            if (!snapshot.hasData ||
+                                snapshot.data!.docs.isEmpty) {
+                              return const Text("No data found");
+                            }
+                            final userData = snapshot.data!.docs;
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: userData.length,
+                                itemBuilder: (context, index) {
+                                  final userDataFields = userData[index];
+
+                                  final montant = userDataFields['montant'];
+                                  final objectif =
+                                      userDataFields['objectifs'] as String? ??
+                                          '';
+                                  
+
+                                  final date = userDataFields['date'];
+
+                                  return ListTile(
+                                    
+                                    trailing: Text(
+                                      "$montant",
+                                      style:
+                                          TextStyle(color: vert, fontSize: 16),
+                                    ),
+                                    title: Text(
+                                      objectif,
+                                      style: TextStyle(
+                                          color: vert,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  );
+                                });
+                          }),
                     ],
                   )),
             ],
           )
           //       }).toList(),
 
-          //  );
-
-          // }
-          // );
-
-          // }
-          // )
           ),
     );
   }
 }
-//     return Scaffold(
-//       appBar:  AppBar(title: ElevatedButton(onPressed: (){
-//           Navigator.push(context, MaterialPageRoute(builder: (context) => OnBoardingPage()));
-//           auth.seDeconnecter();
-//         }, child: Text("Accueil, se deconnecter")),),
-//       body: FutureBuilder<QuerySnapshot>(
-//         future: FirebaseFirestore.instance
-//             .collection('users')
-//             .where('email', isEqualTo: currUserEmail)
-//             .get(),
-//         builder: (context, snapshot) {
-//           if (snapshot.hasError) {
-//             return Text("Error : ${snapshot.error}");
-//           }
-//           if (snapshot.connectionState == ConnectionState.waiting) {
-//             return CircularProgressIndicator();
-//           }
-//           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-//             return const Text("No data found");
-//           }
-//           final userData = snapshot.data!.docs;
-
-//           return ListView.builder(
-//             itemCount: userData.length,
-//             itemBuilder: (context, index) {
-//               final userDataFields = userData[index];
-
-//               final uname = userDataFields['nomComplet'] as String? ?? '';
-//               final email = userDataFields['email'] as String? ?? '';
-//               final phone = userDataFields['telephone'] as String? ?? '';
-
-//               return Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   const SizedBox(
-//                     height: 50,
-//                   ),
-//                   const Icon(
-//                     Icons.person,
-//                     size: 100,
-//                   ),
-//                   SizedBox(
-//                     height: 30,
-//                     child: Text(
-//                       email,
-//                       style: const TextStyle(
-//                         fontSize: 20,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ),
-//                   const SizedBox(
-//                     height: 30,
-//                   ),
-//                   Padding(
-//                     padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
-//                     child: SizedBox(
-//                       height: 40,
-//                       child: Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           Text(
-//                             uname,
-//                             style: const TextStyle(
-//                               fontSize: 20,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                           GestureDetector(
-//                             onTap: () {
-
-//                             },
-//                             child: const Icon(
-//                               Icons.edit,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                   Padding(
-//                     padding: const EdgeInsets.fromLTRB(40, 20, 40, 20),
-//                     child: SizedBox(
-//                       height: 30,
-//                       child: Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           Text(
-//                             phone,
-//                             style: const TextStyle(
-//                               fontSize: 20,
-//                               fontWeight: FontWeight.bold,
-//                             ),
-//                           ),
-//                           GestureDetector(
-//                             onTap: () {
-
-//                             },
-//                             child: const Icon(
-//                               Icons.edit,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                   const SizedBox(
-//                     height: 30,
-//                   ),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       const Text(
-//                         "Want to delete your account ?",
-//                         style: TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                         ),
-//                       ),
-//                       TextButton(
-//                         onPressed: () {
-
-//                         },
-//                         child: const Text(
-//                           "Click here",
-//                           style: TextStyle(
-//                             color: Colors.deepPurple,
-//                             fontWeight: FontWeight.bold,
-//                           ),
-//                         ),
-//                       )
-//                     ],
-//                   ),
-//                 ],
-//               );
-//             },
-//           );
-//         },
-//       ),
-//       );
-
-//   }
-// }

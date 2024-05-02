@@ -24,13 +24,14 @@ class _BudgetPageState extends State<BudgetPage>
     _controller.dispose();
     super.dispose();
   }
-
+DateTimeRange plageChoisi =
+      DateTimeRange(start: DateTime.now(), end: DateTime.now());
   @override
   Widget build(BuildContext context) {
     return  DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(title: Text("Ajouter un Budget"), centerTitle: true, 
+        appBar: AppBar(title: Text("Ajouter un Budget",),  
         bottom: PreferredSize(preferredSize: Size.fromHeight(40), child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           child: Container(
@@ -58,6 +59,7 @@ class _BudgetPageState extends State<BudgetPage>
               ]),
           ),
         )),
+        
         ),
         body: TabBarView(children: [ 
           BudgetSemaine(),
