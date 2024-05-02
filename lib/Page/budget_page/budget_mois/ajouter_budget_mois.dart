@@ -5,15 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-class AjouterSemaine extends StatefulWidget {
-  const AjouterSemaine({super.key});
+class AjouterMois extends StatefulWidget {
+  const AjouterMois({super.key});
 
   @override
-  State<AjouterSemaine> createState() => _AjouterSemaineState();
+  State<AjouterMois> createState() => _AjouterMoisState();
 }
 
-class _AjouterSemaineState extends State<AjouterSemaine> {
+class _AjouterMoisState extends State<AjouterMois> {
   TextEditingController _nombreDeCategorieController = TextEditingController();
+  TextEditingController _titreController = TextEditingController();
+
   List<TextEditingController> _descriptionDesCategories = [];
   List<TextEditingController> _montantDeCategorie = [];
   int _nombreDeCategories = 0;
@@ -21,7 +23,7 @@ class _AjouterSemaineState extends State<AjouterSemaine> {
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
 
 String? userEmail ="";
-
+bool chargement = false;
       @override
   void initState() {
         userEmail = FirebaseAuth.instance.currentUser?.email;
@@ -33,6 +35,7 @@ String? userEmail ="";
   @override
   void dispose() {
     _nombreDeCategorieController.dispose();
+    _titreController.dispose();
     for (var controller in _descriptionDesCategories) {
       controller.dispose();
     }
@@ -46,6 +49,7 @@ void sendBudget(BuildContext context) async {
   // final nobreCat = _nombreDeCategorieController.text.trim();
   // final description = _descriptionDesCategories;
   // final montant = _montantDeCategorie;
+  final titre = _titreController.text.trim();
   final nobreCat = int.tryParse(_nombreDeCategorieController.text.trim()) ?? 0;
   final description = _descriptionDesCategories.map((controller) => controller.text.trim()).toList();
   final montant = _montantDeCategorie.map((controller) => double.tryParse(controller.text.trim()) ?? 0.0).toList();
@@ -53,7 +57,10 @@ void sendBudget(BuildContext context) async {
   
   
   try {
-    if (montant.isNotEmpty && description.isNotEmpty && nobreCat > 0) {
+    setState(() {
+      chargement = true;  
+    });
+    if (titre.isNotEmpty && montant.isNotEmpty && description.isNotEmpty && nobreCat > 0) {
       final eventDoc = FirebaseFirestore.instance.collection("budget").doc();
       List<String> jours = [];
 for (int i = 0; i < _nombreDeCategories; i++) {
@@ -64,26 +71,32 @@ for (int i = 0; i < _nombreDeCategories; i++) {
       final nobreCat = _montantDeCategorie[i].text.trim();
       jours.add(nobreCat);
     }
-      final donneesRevenu = {
+      final donneesBudget = {
        
         'plagedate': {
-          'start': plageChoisi.start,
-          'end': plageChoisi.end,
+          'debut': plageChoisi.start,
+          'fin': plageChoisi.end,
         },
+        'titre': titre,
         'descriptions': description,
         'nombre': nobreCat,
         'montants': montant,
         'email': userEmail,
-        'type': 'semaine',
+        'type': 'mois',
       };
 print("Nombre de descriptions: ${description.length}");
 print("Nombre de nombreCat: ${montant.length}");
+print('$titre');
 
-      await eventDoc.set(donneesRevenu);
+      await eventDoc.set(donneesBudget);
 
       // Récupérer l'ID du document ajouté
       final documentId = eventDoc.id;
       print("Document ajouté avec l'ID: $documentId");
+  Navigator.pop(context);
+      montrerSnackBar("Budget ajouté avec succès", context);
+    } else if (titre.isEmpty) {
+      montrerSnackBar("Veuillez renseigner le titre", context);
     } else if (description.isEmpty) {
       montrerSnackBar("Veuillez renseigner la description", context);
     } else if (montant.isEmpty) {
@@ -91,10 +104,19 @@ print("Nombre de nombreCat: ${montant.length}");
     } else if (nobreCat <= 0) {
       montrerSnackBar("Veuillez renseigner le nombre", context);
     } 
+
+    setState(() {
+      chargement = false;
+    });
   } catch (e) {
     montrerSnackBar("Une erreur est survenue: $e", context);
+    setState(() {
+      chargement = false;
+    });
   }
-
+setState(() {
+  chargement =false;
+});
   print("$montant, $nobreCat, userEmail: $userEmail");
 }
   @override
@@ -111,7 +133,7 @@ print("Nombre de nombreCat: ${montant.length}");
             child: TextButton(
                 onPressed: () async {
                   final DateTimeRange? plageDate = await showDateRangePicker(
-                    helpText: "selectionnez une plage de 7 jours",
+                    helpText: "selectionnez une plage de 30 jours",
                     cancelText: "Quitter",
                     fieldEndHintText: "Date de Fin",
                     fieldStartHintText: "Date de Début",
@@ -135,7 +157,7 @@ print("Nombre de nombreCat: ${montant.length}");
           ),
         ],
         title: Text(
-          "Budget de la semaine", //style: TextStyle(fontSize: 13),
+          "Budget Mensuel", //style: TextStyle(fontSize: 13),
         ),
       ),
       body: ListView(
@@ -145,6 +167,31 @@ print("Nombre de nombreCat: ${montant.length}");
               const SizedBox(
                 height: 10,
               ),
+               Container(
+                    width: 150,
+                    height: 50,
+                    decoration: BoxDecoration(),
+                    child: TextField(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          hintText: "Donnez un tire au budget",
+                          
+                          hintStyle: TextStyle(
+                            fontSize: 10,
+                          )),
+                      keyboardType: TextInputType.number,
+                      controller: _titreController,
+                      cursorColor: vert,
+                      // onChanged: (value) {
+                      //   setState(() {
+                      //     _nombreDeCategories = int.tryParse(value) ?? 0;
+                      //   });
+                      // },
+                    ),
+                  ),
+                  SizedBox(height: 15,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -254,9 +301,9 @@ print("Nombre de nombreCat: ${montant.length}");
                       montrerSnackBar(
                           "veuillez appuiyer sur OK puis remplir tous les champs",
                           context);
-                    } else if (plageChoisi.duration.inDays != 7) {
+                    } else if (plageChoisi.duration.inDays != 30) {
                       montrerSnackBar(
-                          "vous devez choisir au moins 7 jours", context);
+                          "vous devez choisir au moins 30 jours", context);
                     } else {
                      sendBudget  (context);  }
 

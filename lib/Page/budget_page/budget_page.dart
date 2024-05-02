@@ -1,4 +1,6 @@
-import 'package:budget_odc/Page/budget_page/budget_semaine.dart';
+import 'package:budget_odc/Page/budget_page/budget_annee/budget_annee.dart';
+import 'package:budget_odc/Page/budget_page/budget_mois/budget_mois.dart';
+import 'package:budget_odc/Page/budget_page/budget_semaine/budget_semaine.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +33,7 @@ DateTimeRange plageChoisi =
     return  DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(title: Text("Ajouter un Budget",),  
+        appBar: AppBar(title: Text("Gestion de Budgets",),  
         bottom: PreferredSize(preferredSize: Size.fromHeight(40), child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(10)),
           child: Container(
@@ -63,8 +65,8 @@ DateTimeRange plageChoisi =
         ),
         body: TabBarView(children: [ 
           BudgetSemaine(),
-          Center(child: Text("Mois"),),
-          Center(child: Text("Année"),),
+          BudgetMois(),
+          BudgetAnne(),
         ])
       ),
     );

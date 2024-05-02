@@ -24,11 +24,12 @@ class _ConnexionState extends State<Connexion> {
     final email = emailController.text.trim();
     final password = motDePasseController.text.trim();
     if (email.isNotEmpty && password.isNotEmpty) {
-      setState(() {
-        chargement = true;
-      });
+      
 
       try {
+        setState(() {
+        chargement = true;
+      });
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
         // await storeUserType('host');

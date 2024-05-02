@@ -1,20 +1,22 @@
-import 'package:budget_odc/Page/budget_page/ajouter_budget_semain.dart';
+ import 'package:budget_odc/Page/budget_page/budget_mois/ajouter_budget_mois.dart';
+import 'package:budget_odc/Page/budget_page/budget_semaine/ajouter_budget_semain.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-class BudgetSemaine extends StatefulWidget {
-  const BudgetSemaine({super.key});
+class BudgetMois extends StatefulWidget {
+  const BudgetMois({super.key});
 
   @override
-  State<BudgetSemaine> createState() => _BudgetSemaineState();
+  State<BudgetMois> createState() => _BudgetMoisState();
 }
 
-class _BudgetSemaineState extends State<BudgetSemaine>
+class _BudgetMoisState extends State<BudgetMois>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
- DateTimeRange plageChoisie =
+  DateTimeRange plageChoisie =
       DateTimeRange(start: DateTime(2010), end: DateTime(2050));
   Future<void> choisirPlageDeDates() async {
     final plage = await showDateRangePicker(
@@ -45,16 +47,60 @@ class _BudgetSemaineState extends State<BudgetSemaine>
   DateTimeRange plageChoisi =
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
 
+  void afficherDetailBudget(BuildContext context, Map<String, dynamic> budget) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        DateTime debut = budget['plagedate']['debut'].toDate();
+        DateTime fin = budget['plagedate']['fin'].toDate();
+        // Extraire les descriptions et les montants
+        List<String> descriptions = List<String>.from(budget['descriptions']);
+        List<double> montants = List<double>.from(budget['montants']);
+        String titre = budget['titre'];
+        // Calculer le total des montants
+  double montantTotal = montants.fold(0, (prev, montant) => prev + montant);
+        return AlertDialog(
+          title: Text("Détails du Budget"),
+          content: ListView(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(titre, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+                  Text(
+                      "Du ${debut.day}/${debut.month}/${debut.year} Au ${fin.day}/${fin.month}/${fin.year}"),
+                  for (int i = 0; i < descriptions.length; i++)
+                    Text("${descriptions[i]} : ${montants[i]}"),
+                  Text("Total : $montantTotal gnf"),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Fermer"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
+            backgroundColor: vert,
+            child: Icon(Icons.add, color: Colors.white,),
             onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => AjouterSemaine()));
+                      builder: (BuildContext context) => AjouterMois()));
             }),
         body: Stack(children: [
           Container(
@@ -81,22 +127,27 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
+                    } else if(snapshot.data!.docs.isEmpty) {
+                      return Text("Aucun budget disponible");
                     }
 
                     var budgets = snapshot.data!.docs;
-                     // Filtrer les données selon la plage de dates choisie
+                    // Filtrer les données selon la plage de dates choisie
                     var budgetsFiltres = budgets.where((budget) {
                       var plageDeDates = budget['plagedate'];
-                      DateTime start = plageDeDates['start'].toDate();
-                      DateTime end = plageDeDates['end'].toDate();
-                      return start.isAfter(plageChoisie!.start) && end.isBefore(plageChoisie!.end);
+                      DateTime start = plageDeDates['debut'].toDate()?? DateTime.now();
+                      DateTime end = plageDeDates['fin'].toDate();
+                      return start.isAfter(plageChoisie!.start) &&
+                          end.isBefore(plageChoisie!.end);
                     }).toList();
                     // Calculer le montant total uniquement pour les données filtrées
-    double montantTotal = 0;
-    for (var budget in budgetsFiltres) {
-      List<double> montants = List<double>.from(budget['montants']);
-      montantTotal += montants.fold(0, (prev, montant) => prev + montant);
-    }
+                    double montantTotal = 0;
+                    for (var budget in budgetsFiltres) {
+                      List<double> montants =
+                          List<double>.from(budget['montants']);
+                      montantTotal +=
+                          montants.fold(0, (prev, montant) => prev + montant);
+                    }
                     // for (var budget in budgets) {
                     //   List<double> montants =
                     //       List<double>.from(budget['montants']);
@@ -104,30 +155,34 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                     //       montants.fold(0, (prev, montant) => prev + montant);
                     // }
 
-                    return Text(
-                      "Gnf $montantTotal",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    );
+                    return Text.rich(TextSpan(
+                      text: "GNF ",
+                      style: TextStyle(color: Colors.white, fontSize: 15),
+                      children: [
+                        TextSpan(
+                          text: '$montantTotal',
+                          style: TextStyle(color: Colors.white, fontSize: 25),
+                        ),
+                      ],
+                    ));
                   },
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                MaterialButton(
-                  onPressed: () {
-                    choisirPlageDeDates();
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        "Filtrer",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                      Icon(
-                        Icons.filter_list,
-                        color: Colors.white,
-                      ),
-                    ],
+                Center(
+                  child: MaterialButton(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    onPressed: () {
+                      choisirPlageDeDates();
+                    },
+                    child: Text(
+                      "Filtrer",
+                      style: TextStyle(color: vert, fontSize: 20),
+                    ),
                   ),
                 )
               ],
@@ -139,14 +194,16 @@ class _BudgetSemaineState extends State<BudgetSemaine>
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return CircularProgressIndicator();
+                } else if(snapshot.data!.docs.isEmpty){
+                  return Center(child: Text("Aucun Budget"),);
                 }
 
                 var budgets = snapshot.data!.docs;
                 // Filtrer les données selon la plage de dates choisie
                 var budgetsFiltres = budgets.where((budget) {
                   var plageDeDates = budget['plagedate'];
-                  DateTime start = plageDeDates['start'].toDate();
-                  DateTime end = plageDeDates['end'].toDate();
+                  DateTime start = plageDeDates['debut'].toDate()?? DateTime.now();
+                  DateTime end = plageDeDates['fin'].toDate();
                   return start.isAfter(plageChoisie!.start) &&
                       end.isBefore(plageChoisie!.end);
                 }).toList();
@@ -159,7 +216,7 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                 }
 
                 return Positioned(
-                  top: 200,
+                  top: 150,
                   child: Container(
                     width: 350,
                     height: 2000,
@@ -177,13 +234,14 @@ class _BudgetSemaineState extends State<BudgetSemaine>
 
                         // var budget = budgets[index].data();
 // Extraire la plage de dates
-                        DateTime start = budget['plagedate']['start'].toDate();
-                        DateTime end = budget['plagedate']['end'].toDate();
+                        DateTime debut = budget['plagedate']['debut'].toDate();
+                        DateTime fin = budget['plagedate']['fin'].toDate();
                         // Extraire les descriptions et les montants
                         List<String> descriptions =
                             List<String>.from(budget['descriptions']);
                         List<double> montants =
                             List<double>.from(budget['montants']);
+                        String titre = budget['titre'];
 
                         // Vérifier que les listes de descriptions et de montants ont la même longueur
                         if (descriptions.length != montants.length) {
@@ -200,21 +258,43 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Email: ${budget['email']}  $start  $end'),
-                            Text('Nombre de catégories: ${budget['nombre']}'),
                             // Afficher chaque description avec son montant correspondant
                             for (int i = 0; i < descriptions.length; i++)
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  ListTile(
-                                    title: Text("${descriptions[i]}"),
-                                    trailing: Text("${montants[i]}"),
+                                  Container(
+                                    decoration: BoxDecoration(boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.4),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: Offset(0, 3),
+                                      )
+                                    ]),
+                                    child: Card(
+                                      child: ListTile(
+                                        title: Text(
+                                          titre,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        subtitle: Text(
+                                            "Du ${debut.day}/${debut.month}/${debut.year} Au ${fin.day}/${fin.month}/${fin.year}"),
+                                        onTap: () {
+                                          afficherDetailBudget(context, budget);
+                                        },
+                                        // title: Text("${descriptions[i]}"),
+                                        // trailing: Text("${montants[i]}"),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
                             // Afficher le montant total
-                            Text('Montant total: $montantTotal'),
+                            // Text('Montant total: $montantTotal'),
                           ],
                         );
                       },
