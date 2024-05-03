@@ -150,7 +150,7 @@
 //                   return Text("Erreur : ${snapshot.error}");
 //                 }
 //                 if (snapshot.connectionState == ConnectionState.waiting) {
-//                   return CircularProgressIndicator();
+//                   return CircularProgressIndicator(color: vert,);
 //                 }
 //                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
 //                   return const Text("Aucune donnée trouvée");
@@ -210,7 +210,7 @@
 //               stream: FirebaseFirestore.instance.collection('budget').snapshots(),
 //               builder: (context, snapshot) {
 //                 if (!snapshot.hasData) {
-//                   return CircularProgressIndicator();
+//                   return CircularProgressIndicator(color: vert,);
 //                 }
 
 //                 var budgets = snapshot.data!.docs;

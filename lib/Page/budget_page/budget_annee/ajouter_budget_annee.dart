@@ -1,4 +1,5 @@
 import 'package:budget_odc/theme/couleur.dart';
+import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -59,11 +60,11 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
     final montant = _montantDeCategorie
         .map((controller) => double.tryParse(controller.text.trim()) ?? 0.0)
         .toList();
-
-    try {
-      setState(() {
+        setState(() {
         chargement = true;
       });
+    try {
+      
       if (titre.isNotEmpty &&
           montant.isNotEmpty &&
           description.isNotEmpty &&
@@ -95,27 +96,26 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
         print('$titre');
 
         await eventDoc.set(donneesBudget);
-
         // Récupérer l'ID du document ajouté
         final documentId = eventDoc.id;
         print("Document ajouté avec l'ID: $documentId");
+
         Navigator.pop(context);
-        montrerSnackBar("Budget ajouté avec succès", context);
+        montrerSnackBar("Budget ajouté avec succès", context);
+
       } else if (titre.isEmpty) {
-        montrerSnackBar("Veuillez renseigner le titre", context);
+        montrerErreurSnackBar("Veuillez renseigner le titre", context);
       } else if (description.isEmpty) {
-        montrerSnackBar("Veuillez renseigner la description", context);
+        montrerErreurSnackBar("Veuillez renseigner la description", context);
       } else if (montant.isEmpty) {
-        montrerSnackBar("Veuillez renseigner le montant", context);
+        montrerErreurSnackBar("Veuillez renseigner le montant", context);
       } else if (nobreCat <= 0) {
-        montrerSnackBar("Veuillez renseigner le nombre", context);
+        montrerErreurSnackBar("Veuillez renseigner le nombre", context);
       }
 
-      setState(() {
-        chargement = false;
-      });
+      montrerSnackBar("Budget ajouté avec succès", context);
     } catch (e) {
-      montrerSnackBar("Une erreur est survenue: $e", context);
+      montrerErreurSnackBar("Une erreur est survenue: $e", context);
       setState(() {
         chargement = false;
       });
@@ -294,6 +294,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
               SizedBox(
                 height: 15,
               ),
+              chargement ? ChargementWidget():
               MaterialButton(
                   height: 50,
                   minWidth: 250,
@@ -303,14 +304,14 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
                   ),
                   onPressed: () {
                     if (_nombreDeCategorieController.text.isEmpty) {
-                      montrerSnackBar(
+                      montrerErreurSnackBar(
                           "veuillez entrer le nombre de catégorie", context);
                     } else if (_descriptionDesCategories.isEmpty) {
-                      montrerSnackBar(
+                      montrerErreurSnackBar(
                           "veuillez appuiyer sur OK puis remplir tous les champs",
                           context);
                    } else if (plageChoisi.duration.inDays != 365) {
-                      montrerSnackBar(
+                      montrerErreurSnackBar(
                           "vous devez choisir au moins 365 jours", context);
                     } else {
                       ajouterBudget(context);

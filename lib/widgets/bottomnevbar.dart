@@ -2,6 +2,7 @@
 import 'package:budget_odc/Page/budget_page/budget_page.dart';
 import 'package:budget_odc/Page/graphique_page/graphique_page.dart';
 import 'package:budget_odc/Page/home_Page/home_page.dart';
+import 'package:budget_odc/Page/profil_page/modifier_profil.dart';
 import 'package:budget_odc/Page/profil_page/profil_page.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:flutter/material.dart';

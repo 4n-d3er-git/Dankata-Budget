@@ -4,7 +4,7 @@ import 'package:budget_odc/Page/home_Page/ajouter_depense.dart';
 import 'package:budget_odc/Page/home_Page/ajouter_epargne.dart';
 import 'package:budget_odc/Page/home_Page/ajouter_revenu.dart';
 import 'package:budget_odc/Page/onBoarding/on_boarding_page.dart';
-import 'package:budget_odc/Page/profil_page/profil_page.dart';
+import 'package:budget_odc/Page/profil_page/modifier_profil.dart';
 import 'package:budget_odc/models/auth.dart';
 import 'package:budget_odc/models/utilisateursModels.dart';
 import 'package:budget_odc/provider/utilisateur_provider.dart';
@@ -252,6 +252,7 @@ Future<QuerySnapshot> _filtreRevenu() async {
       child: Scaffold(
           backgroundColor: vertBackground,
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             backgroundColor: vertBackground,
             elevation: 0,
             title: Column(
@@ -278,6 +279,14 @@ Future<QuerySnapshot> _filtreRevenu() async {
                 color: vert, borderRadius: BorderRadius.circular(50)),
               child: IconButton(onPressed: ()async {
                     final picked = await showDateRangePicker(
+                      helpText: "selectionnez une plage de date",
+                    cancelText: "Quitter",
+                    fieldEndHintText: "Date de Fin",
+                    fieldStartHintText: "Date de Début",
+                    fieldEndLabelText: "Selectionnez une ",
+                    fieldStartLabelText: "Selectionnez une ",
+                    confirmText: "Confirmer",
+                    saveText: "confirmer",
                   context: context,
                   firstDate: DateTime(2024),
                   lastDate: DateTime(2030),
@@ -307,7 +316,7 @@ Future<QuerySnapshot> _filtreRevenu() async {
               //     return Text("Error : ${snapshot.error}");
               //   }
               //   if (snapshot.connectionState == ConnectionState.waiting) {
-              //     return CircularProgressIndicator();
+              //     return CircularProgressIndicator(color: vert,);
               //   }
               //   if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
               //     return const Text("No data found");
@@ -346,9 +355,9 @@ Future<QuerySnapshot> _filtreRevenu() async {
                             AsyncSnapshot<double> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return CircularProgressIndicator(color: vert,);
                           } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
+                            return Text('Erreur: ${snapshot.error}');
                           } else {
                             double totalRevenus = snapshot.data!;
                             return Container(
@@ -427,9 +436,9 @@ Future<QuerySnapshot> _filtreRevenu() async {
                             AsyncSnapshot<double> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return CircularProgressIndicator(color: vert,);
                           } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
+                            return Text('Erreur: ${snapshot.error}');
                           } else {
                             double totalDepenses = snapshot.data!;
                             return Container(
@@ -492,9 +501,9 @@ Future<QuerySnapshot> _filtreRevenu() async {
                           AsyncSnapshot<double> snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return CircularProgressIndicator(color: vert,);
                         } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
+                          return Text('Erreur: ${snapshot.error}');
                         } else {
                           double solde = snapshot.data!;
                           return Container(
@@ -509,7 +518,7 @@ Future<QuerySnapshot> _filtreRevenu() async {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Montant",
+                                  "Solde",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -541,9 +550,9 @@ Future<QuerySnapshot> _filtreRevenu() async {
                             AsyncSnapshot<double> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return CircularProgressIndicator(color: vert,);
                           } else if (snapshot.hasError) {
-                            return Text('Error: ${snapshot.error}');
+                            return Text('Erreur: ${snapshot.error}');
                           } else {
                             double totalEpargnes = snapshot.data!;
                             return Container(
@@ -599,7 +608,7 @@ Future<QuerySnapshot> _filtreRevenu() async {
                     //       AsyncSnapshot<double> snapshot) {
                     //     if (snapshot.connectionState ==
                     //         ConnectionState.waiting) {
-                    //       return CircularProgressIndicator();
+                    //       return CircularProgressIndicator(color: vert,);
                     //     } else if (snapshot.hasError) {
                     //       return Text('Error: ${snapshot.error}');
                     //     } else {
@@ -640,10 +649,7 @@ Future<QuerySnapshot> _filtreRevenu() async {
               SizedBox(
                 height: 8,
               ),
-              Text("Date"),
-              SizedBox(
-                height: 8,
-              ),
+              
               TabBar(
                 tabs: [
                   
@@ -660,9 +666,10 @@ Future<QuerySnapshot> _filtreRevenu() async {
                 indicatorColor: vertBackground,
                 labelColor: vert,
                 unselectedLabelColor: noir,
+                indicatorWeight : 1,
               ),
               Container(
-                  height: 200,
+                  height: 250,
                   child: TabBarView(
                     children: [
                       
@@ -671,15 +678,15 @@ Future<QuerySnapshot> _filtreRevenu() async {
                           future:_filtreRevenu(),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
-                              return Text("Error : ${snapshot.error}");
+                              return Text("Erreur : ${snapshot.error}");
                             }
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return CircularProgressIndicator(color: vert,);
                             }
                             if (!snapshot.hasData ||
                                 snapshot.data!.docs.isEmpty) {
-                              return const Text("No data found");
+                              return Center(child: const Text("Aucun Revenu"));
                             }
                             final userData = snapshot.data!.docs;
                             return ListView.builder(
@@ -730,15 +737,15 @@ Future<QuerySnapshot> _filtreRevenu() async {
                               
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
-                              return Text("Error : ${snapshot.error}");
+                              return Text("Erreur : ${snapshot.error}");
                             }
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return CircularProgressIndicator(color: vert,);
                             }
                             if (!snapshot.hasData ||
                                 snapshot.data!.docs.isEmpty) {
-                              return const Text("No data found");
+                              return Center(child:  Text("Aucune Dépense"));
                             }
                             final userData = snapshot.data!.docs;
                             return ListView.builder(
@@ -790,15 +797,15 @@ Future<QuerySnapshot> _filtreRevenu() async {
                              
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
-                              return Text("Error : ${snapshot.error}");
+                              return Text("Erreur : ${snapshot.error}");
                             }
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return CircularProgressIndicator();
+                              return CircularProgressIndicator(color: vert,);
                             }
                             if (!snapshot.hasData ||
                                 snapshot.data!.docs.isEmpty) {
-                              return const Text("No data found");
+                              return Center(child: Text("Aucune Epargne"));
                             }
                             final userData = snapshot.data!.docs;
                             return ListView.builder(

@@ -1,4 +1,5 @@
 import 'package:budget_odc/theme/couleur.dart';
+import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -169,7 +170,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
 
     documentId = eventDoc.id;
   }
-
+bool chargement = false;
   //!
   void onPressedD(BuildContext context) async {
   final montant = _montantController.text.trim();
@@ -177,7 +178,9 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
   final compte = selectedValue.toString();
   final heure = _selectedTime.toString();
   final date = _selectedDate.toString();
-
+setState(() {
+  chargement = true;
+});
   try {
     if (montant.isNotEmpty && date.isNotEmpty && heure.isNotEmpty && categorie.isNotEmpty && compte.isNotEmpty) {
       final eventDoc = FirebaseFirestore.instance.collection("transaction").doc();
@@ -193,23 +196,27 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
       };
 
       await eventDoc.set(donneesRevenu);
-
+      Navigator.pop(context);
+      montrerSnackBar("Revenu ajouté avec succès", context);
       // Récupérer l'ID du document ajouté
       final documentId = eventDoc.id;
       print("Document ajouté avec l'ID: $documentId");
     } else if (date.isEmpty) {
-      montrerSnackBar("Veuillez renseigner la date", context);
+      montrerErreurSnackBar("Veuillez renseigner la date", context);
     } else if (heure.isEmpty) {
-      montrerSnackBar("Veuillez renseigner l'heure", context);
+      montrerErreurSnackBar("Veuillez renseigner l'heure", context);
     } else if (montant.isEmpty) {
-      montrerSnackBar("Veuillez renseigner le montant", context);
+      montrerErreurSnackBar("Veuillez renseigner le montant", context);
     } else if (categorie.isEmpty) {
-      montrerSnackBar("Veuillez renseigner la catégorie", context);
+      montrerErreurSnackBar("Veuillez renseigner la catégorie", context);
     } else if (compte.isEmpty) {
-      montrerSnackBar("Veuillez renseigner le compte", context);
+      montrerErreurSnackBar("Veuillez renseigner le compte", context);
     }
   } catch (e) {
-    montrerSnackBar("Une erreur est survenue: $e", context);
+    montrerErreurSnackBar("Une erreur est survenue: $e", context);
+    setState(() {
+      chargement= false;
+    });
   }
 
   print("$montant, $categorie, $compte, $heure, $date? $documentId, userEmail: $userEmail");
@@ -448,6 +455,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
               SizedBox(
                 height: 20,
               ),
+              chargement ? ChargementWidget():
               MaterialButton(
                   height: 50,
                   minWidth: 250,
@@ -495,7 +503,8 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
                   //   }
                   //   print("$montant, $categorie, $compte, $heure, $_selectedTime, $date, $_selectedDate ");
                   // },
-                  onPressed: (){onPressedD(context);},
+                  onPressed: (){
+                    onPressedD(context);},
                   // onPressed: () async {
                   //   print("ok");
                   // },

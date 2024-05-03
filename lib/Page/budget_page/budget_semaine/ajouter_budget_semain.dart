@@ -1,4 +1,5 @@
 import 'package:budget_odc/theme/couleur.dart';
+import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,11 +56,11 @@ void sendBudget(BuildContext context) async {
   final montant = _montantDeCategorie.map((controller) => double.tryParse(controller.text.trim()) ?? 0.0).toList();
   
   
-  
-  try {
-    setState(() {
+  setState(() {
       chargement = true;  
     });
+  try {
+    
     if (titre.isNotEmpty && montant.isNotEmpty && description.isNotEmpty && nobreCat > 0) {
       final eventDoc = FirebaseFirestore.instance.collection("budget").doc();
       List<String> jours = [];
@@ -89,12 +90,13 @@ print("Nombre de nombreCat: ${montant.length}");
 print('$titre');
 
       await eventDoc.set(donneesBudget);
-
+      montrerSnackBar("Budget ajouté avec succès", context);
       // Récupérer l'ID du document ajouté
       final documentId = eventDoc.id;
       print("Document ajouté avec l'ID: $documentId");
+      
   Navigator.pop(context);
-      montrerSnackBar("Budget ajouté avec succès", context);
+
     } else if (titre.isEmpty) {
       montrerSnackBar("Veuillez renseigner le titre", context);
     } else if (description.isEmpty) {
@@ -105,11 +107,9 @@ print('$titre');
       montrerSnackBar("Veuillez renseigner le nombre", context);
     } 
 
-    setState(() {
-      chargement = false;
-    });
+    
   } catch (e) {
-    montrerSnackBar("Une erreur est survenue: $e", context);
+    montrerErreurSnackBar("Une erreur est survenue: $e", context);
     setState(() {
       chargement = false;
     });
@@ -286,6 +286,7 @@ setState(() {
               SizedBox(
                 height: 15,
               ),
+              chargement ? ChargementWidget():
               MaterialButton(
                   height: 50,
                   minWidth: 250,
@@ -295,14 +296,14 @@ setState(() {
                   ),
                   onPressed: () {
                     if (_nombreDeCategorieController.text.isEmpty) { 
-                      montrerSnackBar(
+                      montrerErreurSnackBar(
                           "veuillez entrer le nombre de catégorie", context);
                     } else if (_descriptionDesCategories.isEmpty) {
-                      montrerSnackBar(
+                      montrerErreurSnackBar(
                           "veuillez appuiyer sur OK puis remplir tous les champs",
                           context);
                     } else if (plageChoisi.duration.inDays != 7) {
-                      montrerSnackBar(
+                      montrerErreurSnackBar(
                           "vous devez choisir au moins 7 jours", context);
                     } else {
                      sendBudget  (context);  }

@@ -1,5 +1,8 @@
 import 'package:budget_odc/theme/couleur.dart';
+import 'package:budget_odc/widgets/chargement.dart';
+import 'package:budget_odc/widgets/message.dart';
 import 'package:budget_odc/widgets/textfield_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MotDePassOublie extends StatefulWidget {
@@ -12,6 +15,36 @@ class MotDePassOublie extends StatefulWidget {
 class _MotDePassOublieState extends State<MotDePassOublie> {
   TextEditingController emailController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  bool chargement = false;
+  final _auth = FirebaseAuth.instance;
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _envoyerEmailVerificatiion(String email) async {
+    setState(() {
+        chargement = true;
+      });
+    try {
+      
+      await _auth.sendPasswordResetEmail(email: email);
+      montrerSnackBar(
+          "Un mail vous à été envoyé contenant un lien pour réinitialiser votre mot de pass",
+          context);
+      emailController.clear();
+      setState(() {
+        chargement = false;
+      });
+    } catch (e) {
+      montrerErreurSnackBar(
+          "une erreur s'est produite, veuillez réessayer", context);
+      setState(() {
+        chargement = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +76,11 @@ class _MotDePassOublieState extends State<MotDePassOublie> {
                             key: formKey,
                             child: Column(
                               children: [
+                                Text(
+                                    "Un mail contenant un lien pour réinitialiser votre mot de pass vous sera envoyé à votre adresse"
+                                    " email",style: TextStyle(color: gris),
+                                    ),
+                                    SizedBox(height: 10,),
                                 TextFiedWiget(
                                   labelText: 'Email',
                                   hintTexte: 'Email',
@@ -53,26 +91,34 @@ class _MotDePassOublieState extends State<MotDePassOublie> {
                                     }
                                     return null;
                                   },
+                                  mdp: false,
                                 ),
                                 SizedBox(
                                   height: 15,
                                 ),
-                                MaterialButton(
-                                    height: 50,
-                                    minWidth: 250,
-                                    color: vert,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    onPressed: () {
-                                      if (formKey.currentState!.validate()) {
-                                      } else {}
-                                    },
-                                    child: Text(
-                                      "Envoyer le Lien",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    )),
+                                chargement
+                                    ? ChargementWidget()
+                                    : MaterialButton(
+                                        height: 50,
+                                        minWidth: 250,
+                                        color: vert,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        onPressed: () {
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            _envoyerEmailVerificatiion(
+                                                emailController.text.trim());
+                                          } else {}
+                                        },
+                                        child: Text(
+                                          "Envoyer le Lien",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        )),
                                 SizedBox(
                                   height: 15,
                                 ),

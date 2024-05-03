@@ -1,4 +1,5 @@
 import 'package:budget_odc/theme/couleur.dart';
+import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,18 +40,17 @@ bool chargement = false;
 
 
 
-  
 
    //!
   void onPressedD(BuildContext context) async {
   final montant = _montantController.text.trim();
   final objectif = _objectifController.text.trim();
-
+  setState(() {
+    chargement = true;
+  });
   try {
     if (montant.isNotEmpty   && objectif.isNotEmpty ) {
-      setState(() {
-        chargement = true;
-      });
+      
       final eventDoc = FirebaseFirestore.instance.collection("transaction").doc();
 
       final donneesRevenu = {
@@ -62,17 +62,18 @@ bool chargement = false;
       };
 
       await eventDoc.set(donneesRevenu);
-
+      Navigator.pop(context);
+      montrerSnackBar("Epargne ajouté avec succès", context);
       // Récupérer l'ID du document ajouté
       final documentId = eventDoc.id;
       print("Document ajouté avec l'ID: $documentId");
     } else if (montant.isEmpty) {
-      montrerSnackBar("Veuillez renseigner le montant", context);
+      montrerErreurSnackBar("Veuillez renseigner le montant", context);
     } else if (objectif.isEmpty) {
-      montrerSnackBar("Veuillez renseigner au moins un objectif", context);
+      montrerErreurSnackBar("Veuillez renseigner au moins un objectif", context);
     } 
   } catch (e) {
-    montrerSnackBar("Une erreur est survenue: $e", context);
+    montrerErreurSnackBar("Une erreur est survenue: $e", context);
     setState(() {
       chargement = false;
     });
@@ -170,9 +171,7 @@ bool chargement = false;
                 height: 20,
               ),
               chargement ? 
-              LinearProgressIndicator(
-                color: vert,
-              ):
+             ChargementWidget():
               MaterialButton(
                   height: 50,
                   minWidth: 250,

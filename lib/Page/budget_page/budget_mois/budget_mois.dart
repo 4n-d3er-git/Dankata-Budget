@@ -2,6 +2,7 @@
 import 'package:budget_odc/Page/budget_page/budget_semaine/ajouter_budget_semain.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,6 +21,14 @@ class _BudgetMoisState extends State<BudgetMois>
       DateTimeRange(start: DateTime(2010), end: DateTime(2050));
   Future<void> choisirPlageDeDates() async {
     final plage = await showDateRangePicker(
+      helpText: "selectionnez une plage de date",
+                    cancelText: "Quitter",
+                    fieldEndHintText: "Date de Fin",
+                    fieldStartHintText: "Date de Début",
+                    fieldEndLabelText: "Selectionnez une ",
+                    fieldStartLabelText: "Selectionnez une ",
+                    confirmText: "Confirmer",
+                    saveText: "confirmer",
       context: context,
       firstDate: DateTime(2022),
       lastDate: DateTime(2025),
@@ -122,21 +131,19 @@ class _BudgetMoisState extends State<BudgetMois>
                 ),
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
-                      .collection('budget')
+                      .collection('budget').where('type',isEqualTo: 'mois').where('email',isEqualTo: FirebaseAuth.instance.currentUser!.email)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return CircularProgressIndicator();
-                    } else if(snapshot.data!.docs.isEmpty) {
-                      return Text("Aucun budget disponible");
-                    }
+                      return CircularProgressIndicator(color: vert,);
+                    } 
 
                     var budgets = snapshot.data!.docs;
                     // Filtrer les données selon la plage de dates choisie
                     var budgetsFiltres = budgets.where((budget) {
                       var plageDeDates = budget['plagedate'];
-                      DateTime start = plageDeDates['debut'].toDate()?? DateTime.now();
-                      DateTime end = plageDeDates['fin'].toDate();
+                      DateTime start = plageDeDates['debut'].toDate();
+                      DateTime end = plageDeDates['fin'].toDate() ;
                       return start.isAfter(plageChoisie!.start) &&
                           end.isBefore(plageChoisie!.end);
                     }).toList();
@@ -190,20 +197,18 @@ class _BudgetMoisState extends State<BudgetMois>
           ),
           StreamBuilder(
               stream:
-                  FirebaseFirestore.instance.collection('budget').snapshots(),
+                  FirebaseFirestore.instance.collection('budget').where('type',isEqualTo: 'mois').where('email',isEqualTo: FirebaseAuth.instance.currentUser!.email).snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
-                } else if(snapshot.data!.docs.isEmpty){
-                  return Center(child: Text("Aucun Budget"),);
-                }
+                  return CircularProgressIndicator(color: vert,);
+                } 
 
                 var budgets = snapshot.data!.docs;
                 // Filtrer les données selon la plage de dates choisie
                 var budgetsFiltres = budgets.where((budget) {
                   var plageDeDates = budget['plagedate'];
-                  DateTime start = plageDeDates['debut'].toDate()?? DateTime.now();
-                  DateTime end = plageDeDates['fin'].toDate();
+                  DateTime start = plageDeDates['debut'].toDate();
+                  DateTime end = plageDeDates['fin'] .toDate();
                   return start.isAfter(plageChoisie!.start) &&
                       end.isBefore(plageChoisie!.end);
                 }).toList();

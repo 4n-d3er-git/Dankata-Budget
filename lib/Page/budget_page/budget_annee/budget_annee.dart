@@ -2,6 +2,7 @@ import 'package:budget_odc/Page/budget_page/budget_annee/ajouter_budget_annee.da
 import 'package:budget_odc/Page/budget_page/budget_semaine/ajouter_budget_semain.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,6 +21,14 @@ class _BudgetAnneState extends State<BudgetAnne>
       DateTimeRange(start: DateTime(2010), end: DateTime(2050));
   Future<void> choisirPlageDeDates() async {
     final plage = await showDateRangePicker(
+      helpText: "selectionnez une plage de date",
+                    cancelText: "Quitter",
+                    fieldEndHintText: "Date de Fin",
+                    fieldStartHintText: "Date de Début",
+                    fieldEndLabelText: "Selectionnez une ",
+                    fieldStartLabelText: "Selectionnez une ",
+                    confirmText: "Confirmer",
+                    saveText: "confirmer",
       context: context,
       firstDate: DateTime(2022),
       lastDate: DateTime(2025),
@@ -123,10 +132,11 @@ class _BudgetAnneState extends State<BudgetAnne>
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('budget')
+                      .where('type',isEqualTo: 'annee').where('email',isEqualTo: FirebaseAuth.instance.currentUser!.email)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return CircularProgressIndicator();
+                      return CircularProgressIndicator(color: vert,);
                     }
 
                     var budgets = snapshot.data!.docs;
@@ -188,10 +198,12 @@ class _BudgetAnneState extends State<BudgetAnne>
           ),
           StreamBuilder(
               stream:
-                  FirebaseFirestore.instance.collection('budget').snapshots(),
+                  FirebaseFirestore.instance.collection('budget')
+                  .where('type',isEqualTo: 'annee').where('email',isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return CircularProgressIndicator();
+                  return CircularProgressIndicator(color: vert,);
                 }
 
                 var budgets = snapshot.data!.docs;

@@ -2,6 +2,8 @@ import 'package:budget_odc/Page/auth_Page/connexion.dart';
 import 'package:budget_odc/Page/home_Page/home_page.dart';
 import 'package:budget_odc/models/auth.dart';
 import 'package:budget_odc/theme/couleur.dart';
+import 'package:budget_odc/widgets/bottomnevbar.dart';
+import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:budget_odc/widgets/textfield_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Inscription extends StatefulWidget {
-  const Inscription({Key? key}): super (key: key);
+  const Inscription({Key? key}) : super(key: key);
 
   @override
   State<Inscription> createState() => _InscriptionState();
@@ -32,12 +34,12 @@ class _InscriptionState extends State<Inscription> {
     _nomCompletController.dispose();
     _emailController.dispose();
     _telephoneController.dispose();
-   _motDePasseController.dispose();
+    _motDePasseController.dispose();
     _confirmerMotDePassController.dispose();
     super.dispose();
   }
 
- Future addUserDetails(
+  Future addUserDetails(
     String nom,
     String email,
     String telephone,
@@ -60,18 +62,23 @@ class _InscriptionState extends State<Inscription> {
         email.isNotEmpty &&
         telephone.isNotEmpty &&
         motdepass == cmotdepass &&
-        motdepass.length >= 7 ) {
+        motdepass.length >= 7) {
       setState(() {
         chargement = true;
       });
       try {
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: motdepass);
-        addUserDetails(nom, email, telephone, );
+        addUserDetails(
+          nom,
+          email,
+          telephone,
+        );
         // ignore: use_build_context_synchronously
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return  HomePage();
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+          return BottomNavBar();
         }));
+        montrerSnackBar("Bienveu dans ...", context);
         _nomCompletController.clear();
         _emailController.clear();
         _telephoneController.clear();
@@ -80,84 +87,54 @@ class _InscriptionState extends State<Inscription> {
       } on FirebaseAuthException catch (e) {
         //print(e.code);
         if (e.code == 'weak-password') {
-          showAlertDialog(context, 'Invalid Input', 'Weak password');
+          montrerErreurSnackBar("Mot de pass trop court", context);
         } else if (e.code == 'email-already-in-use') {
-          showAlertDialog(context, 'Invalid Input', 'Email already in use');
+          montrerErreurSnackBar("Un utilisateur existe déjà avec cet email", context);
         } else if (e.code == 'invalid-email') {
-          showAlertDialog(context, 'Invalid Input', 'Invalid email');
+          montrerErreurSnackBar("Cette adresse email est incorrect", context);
         } else if (e.code == 'user-not-found') {
-          showAlertDialog(context, 'Invalid Input', 'User not found');
+          montrerErreurSnackBar("Aucun utilisateur trouvé", context);
         } else if (e.code == 'too-many-requests') {
-          showAlertDialog(context, 'Invalid Input',
-              'Too many login attempts. Please try again later.');
+          montrerErreurSnackBar(
+              "Vous avez essayé assez de tentation veuillez reéssayer plus tard",
+              context);
         } else if (e.code == 'user-disabled') {
-          showAlertDialog(context, 'Invalid Input', 'User account disabled');
+          montrerErreurSnackBar(
+              "Cet utilisateur à été désactivé veuillez contacter un administrateur",
+              context);
         } else if (e.code == 'operation-not-allowed') {
-          showAlertDialog(context, 'Invalid Input', 'Operation not allowed');
+          montrerErreurSnackBar("Opération non allouée", context);
         } else if (e.code == 'invalid-credential') {
-          showAlertDialog(context, 'Invalid Input', 'Invalid credential');
+          montrerErreurSnackBar("Erreur", context);
         } else if (e.code == 'account-exists-with-different-credential') {
-          showAlertDialog(context, 'Invalid Input',
-              'An account with the same email already exists but with a different sign-in method');
+          montrerErreurSnackBar("Erreur Inconnue", context);
         } else if (e.code == 'network-request-failed') {
-          showAlertDialog(context, 'Invalid Input', 'check your internet');
-        }
+          montrerErreurSnackBar("impossible de se connecter, veuillez vérifier votre connexion intrnet puis reessayer",context);
+                }
       } catch (e) {
-        // print("something bad happened");
-        // print(e
-        //     .runtimeType); //this will give the type of exception that occured
-        // print(e);
+        montrerSnackBar("$e", context);
       } finally {
         setState(() {
           chargement = false;
         });
       }
-    } else if (nom.isEmpty) {
-      showAlertDialog(context, "Invalid Input", "please enter username");
+    } 
+    else if (nom.isEmpty) {
+      montrerErreurSnackBar("Veuillez entrer votre nom complet",  context);
     } else if (email.isEmpty) {
-      showAlertDialog(context, "Invalid Input", "please enter your email");
+      montrerErreurSnackBar("Veuillez entrer votre Email", context);
     } else if (!email.contains('@')) {
-      showAlertDialog(context, "Invalid Input", "please enter correct email");
-    } else if (!email.contains('@')) {
-      showAlertDialog(context, "Invalid Input", "please enter correct email");
+      montrerErreurSnackBar("Veullez entrer un email valide", context);
     } else if (telephone.isEmpty) {
-      showAlertDialog(context, "Invalid Input", "please enter your mobile no.");
-    } else if (telephone.length != 10) {
-      showAlertDialog(
-          context, "Invalid Input", "please enter correct phone no.");
+      montrerErreurSnackBar("veuillez entrer votre numero de telephone", context);
     } else if (motdepass.isEmpty) {
-      showAlertDialog(context, "Invalid Input", "please enter password");
-    } else if (motdepass.length < 8) {
-      showAlertDialog(context, "Invalid Input",
-          "password length must be minimum of 8 characters");
+      montrerErreurSnackBar("Veuillez entrer votre mot de pass", context);
     } else if (motdepass != cmotdepass) {
-      showAlertDialog(context, "Invalid Input",
-          "password and confirm password are not same");
+      montrerErreurSnackBar("Les deux mots de pass ne correspondent pas, veuillez corriger puis reesyer", context);
     }
   }
 
-  void showAlertDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              child: const Text(
-                'OK',
-                style: TextStyle(color: Colors.deepPurple),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -177,7 +154,7 @@ class _InscriptionState extends State<Inscription> {
     //     chargement = false;
     //   });
     //   }
-      
+
     // }
     // sousmissionInformations() async {
     //   setState(() {
@@ -239,6 +216,7 @@ class _InscriptionState extends State<Inscription> {
                                     }
                                     return null;
                                   },
+                                  mdp: false,
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -253,6 +231,7 @@ class _InscriptionState extends State<Inscription> {
                                     }
                                     return null;
                                   },
+                                  mdp: false,
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -267,6 +246,7 @@ class _InscriptionState extends State<Inscription> {
                                     }
                                     return null;
                                   },
+                                  mdp: false,
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -281,6 +261,7 @@ class _InscriptionState extends State<Inscription> {
                                     }
                                     return null;
                                   },
+                                  mdp: true,
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -295,42 +276,40 @@ class _InscriptionState extends State<Inscription> {
                                     }
                                     return null;
                                   },
+                                  mdp: true,
                                 ),
                                 SizedBox(
                                   height: 15,
                                 ),
-                                chargement ?
-                                LinearProgressIndicator(
-
-                                ):
-                                MaterialButton(
-                                    height: 50,
-                                    minWidth: 250,
-                                    color: vert,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    onPressed: () {
-                                      if (formKey.currentState!.validate()) {
-                                        
-                                      } 
-                                      if (_motDePasseController.text !=
-                                          _confirmerMotDePassController.text) {
-                                         montrerSnackBar("Les mots de passe ne sont pas identiques", context);
-
-                                      }else{
-                                        print("valide");
-                                        registerUser();
-                                        print("${_nomCompletController.text}, ${_emailController.text}, ${_telephoneController.text}, ${_motDePasseController.text}");
-
-
-                                      }
-                                    },
-                                    child: Text(
-                                      "S'inscrire",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    )),
+                                chargement
+                                    ? ChargementWidget()
+                                    : MaterialButton(
+                                        height: 50,
+                                        minWidth: 250,
+                                        color: vert,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        onPressed: () {
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                                registerUser();
+                                            print(
+                                                "${_nomCompletController.text}, ${_emailController.text}, ${_telephoneController.text}, ${_motDePasseController.text}");
+                                          
+                                              }
+                                          
+                                           else {
+                                            print("non valide");
+                                            }
+                                        },
+                                        child: Text(
+                                          "S'inscrire",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        )),
                                 SizedBox(
                                   height: 15,
                                 ),

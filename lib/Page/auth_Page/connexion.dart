@@ -3,10 +3,12 @@ import 'package:budget_odc/Page/auth_Page/mot_de_passs_oublie.dart';
 import 'package:budget_odc/Page/home_Page/home_page.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:budget_odc/widgets/bottomnevbar.dart';
+import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:budget_odc/widgets/textfield_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Connexion extends StatefulWidget {
   const Connexion({super.key});
@@ -20,6 +22,8 @@ class _ConnexionState extends State<Connexion> {
   TextEditingController motDePasseController = TextEditingController();
   final formKey = GlobalKey<FormState>();
   bool chargement = false;
+  // FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   void connexion() async {
     final email = emailController.text.trim();
     final password = motDePasseController.text.trim();
@@ -34,54 +38,46 @@ class _ConnexionState extends State<Connexion> {
             .signInWithEmailAndPassword(email: email, password: password);
         // await storeUserType('host');
         // ignore: use_build_context_synchronously
+         // Stockage de l'état de connexion dans SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLoggedIn', true);
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
           return const BottomNavBar();
         }));
+        montrerSnackBar("Content de vous revoir", context);
         emailController.clear();
         motDePasseController.clear();
       } on FirebaseAuthException catch (e) {
         // print(e.code);
         if (e.code == "user-not-found") {
-          montrerSnackBar(
-               "user not found, please register", context);
+          montrerErreurSnackBar("Utilisateur non trouvé, veuillez vous inscrire",  context);
         } else if (e.code == "wrong-password") {
-          montrerSnackBar( "incorrect password", context);
+          montrerErreurSnackBar("Mot de Pass incorrecte",  context);
         } else if (e.code == 'email-already-in-use') {
-          montrerSnackBar( 'Email already in use', context);
+          montrerErreurSnackBar("Cet email est déjà utilisé",  context);
         } else if (e.code == 'invalid-email') {
-          montrerSnackBar( 'Invalid email', context);
-        } else if (e.code == 'user-not-found') {
-          montrerSnackBar( 'User not found', context);
-        } else if (e.code == 'too-many-requests') {
-          montrerSnackBar(
-              'Too many login attempts. Please try again later.', context);
+          montrerErreurSnackBar("Adresse email invalide",  context);
+        }  else if (e.code == 'too-many-requests') {
+         montrerErreurSnackBar("Vous avez fait assez de tentative, veuillez réessayer plus tard",  context);
         } else if (e.code == 'user-disabled') {
-          montrerSnackBar('User account disabled', context);
+          montrerErreurSnackBar("Cet utilisateur à été désactivé, veuillez contacter un administrateur",  context);
         } else if (e.code == 'operation-not-allowed') {
-          montrerSnackBar( 'Operation not allowed', context);
+          montrerErreurSnackBar("Opération non allouée",  context);
         } else if (e.code == 'invalid-credential') {
-          montrerSnackBar('Invalid credential', context);
+          montrerErreurSnackBar("Erreur de connexion",  context);
         } else if (e.code == 'account-exists-with-different-credential') {
-          montrerSnackBar(            
-           'An account with the same email already exists but with a different sign-in method', context);
+          montrerErreurSnackBar("Erreur de connexion",  context);
         } else if (e.code == 'network-request-failed') {
-          montrerSnackBar( 'Invalid Input', context);
+          montrerErreurSnackBar("Impossible de se connecter, veuillez vérifier votre connexion internet",  context);
         }
       } catch (e) {
-        // print("something bad happened");
-        // print(e
-        //     .runtimeType); //this will give the type of exception that occured
-        // print(e);
+        montrerErreurSnackBar("$e", context);
       } finally {
         setState(() {
           chargement = false;
         });
       }
-    } else if (email.isEmpty) {
-      montrerSnackBar("please enter email", context);
-    } else if (password.isEmpty) {
-      montrerSnackBar( "please enter password", context);
-    }
+    } 
   }
 @override
   void initState() {
@@ -136,7 +132,7 @@ class _ConnexionState extends State<Connexion> {
                                       return 'Veuillez entrer votre email';
                                     }
                                     return null;
-                                  },
+                                  }, mdp: false,
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -151,6 +147,7 @@ class _ConnexionState extends State<Connexion> {
                                     }
                                     return null;
                                   },
+                                  mdp: true,
                                 ),
                                 SizedBox(
                                   height: 10,
@@ -173,6 +170,7 @@ class _ConnexionState extends State<Connexion> {
                                 SizedBox(
                                   height: 15,
                                 ),
+                                chargement ? ChargementWidget():
                                 MaterialButton(
                                     height: 50,
                                     minWidth: 250,

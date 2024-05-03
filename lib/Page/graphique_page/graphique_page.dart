@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:budget_odc/Page/onBoarding/on_boarding_page.dart';
+import 'package:budget_odc/theme/couleur.dart';
 import 'package:budget_odc/widgets/bottomnevbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -170,20 +171,28 @@ Color getColorForCategory(String category) {
             future: getRevenuData(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(color: vert,));
               } else {
                 if (snapshot.hasError || snapshot.data == null) {
                   return Center(child: Text('Erreur: ${snapshot.error}'));
-                } else {
+                  
+                } 
+                else if (snapshot.data!.isEmpty) {
+                    return Text("");
+                  }
+                else {
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(top: 30,left: 80.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      
                       children: [
+                       Text("Grapique des Revenus", style: TextStyle(fontWeight: FontWeight.bold, 
+                       fontSize: 20
+                       ),),
                         Container(
                           height: 200,
                           width: 200,
+
                           child: revenuGraphe(snapshot.data!)),
                           SizedBox(height: 10,),
                          
@@ -199,17 +208,22 @@ Color getColorForCategory(String category) {
             future: getDepenseData(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return Center(child: CircularProgressIndicator(color: vert,));
               } else {
                 if (snapshot.hasError || snapshot.data == null) {
                   return Center(child: Text('Erreur: ${snapshot.error}'));
-                } else {
+                } else if (snapshot.data!.isEmpty) {
+                    return Center(child: Text("Ajoutez des revenus et des depenses pour voir les graphiques."));
+                }
+                else {
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(top: 30,left: 80.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      
                       children: [
+                       Text("Grapique des Dépenses", style: TextStyle(fontWeight: FontWeight.bold, 
+                       fontSize: 20
+                       ),),
                         Container(
                           height: 200,
                           width: 200,
@@ -229,7 +243,7 @@ Color getColorForCategory(String category) {
       //   future: fetchData(),
       //   builder: (context, snapshot) {
       //     if (snapshot.connectionState == ConnectionState.waiting) {
-      //       return Center(child: CircularProgressIndicator());
+      //       return Center(child: CircularProgressIndicator(color: vert,));
       //     } else {
       //       if (snapshot.hasError) {
       //         return Center(child: Text('Erreur: ${snapshot.error}'));

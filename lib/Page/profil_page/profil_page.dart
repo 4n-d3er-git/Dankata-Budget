@@ -1,10 +1,12 @@
 import 'package:budget_odc/Page/onBoarding/on_boarding_page.dart';
+import 'package:budget_odc/Page/profil_page/modifier_profil.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:budget_odc/widgets/message.dart';
-import 'package:budget_odc/widgets/textfield_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
@@ -13,35 +15,119 @@ class ProfilPage extends StatefulWidget {
   State<ProfilPage> createState() => _ProfilPageState();
 }
 
-class _ProfilPageState extends State<ProfilPage>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  TextEditingController _nomCompletController = TextEditingController();
-  TextEditingController _telephoneController = TextEditingController();
-  final formKey = GlobalKey<FormState>();
+class _ProfilPageState extends State<ProfilPage> {
+// FirebaseAuth instance
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  bool obscurcir = true;
-  bool obscurcir1 = true;
-  bool chargement = false;
+  // Méthode pour déconnecter l'utilisateur
+  Future<void> _deconnexion(BuildContext context) async {
+    try {
+      // Appel de la méthode de déconnexion de Firebase Auth
+      await _auth.signOut();
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+      // Supprimer l'état de connexion de SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.remove('isLoggedIn');
+      print("Déconnecté");
+      // Naviguer vers la LoginPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => OnBoardingPage()),
+      );
+    } catch (e) {
+      // Gestion des erreurs de déconnexion
+      print("Erreur de déconnexion : $e");
+      // Affichez un message d'erreur à l'utilisateur
+      montrerErreurSnackBar("Erreur de déconnexion", context);
+    }
   }
 
   String? currUserEmail = FirebaseAuth.instance.currentUser!.email;
 
+  void conseilDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Conseils"),
+          content: Text(
+              "Ceci est la section conseil, en cliquant sur OK vous serrez "
+              "rédirigé vers le site pour consulter des conseils sur ."),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Annuler',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // fermer dialog
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'OK',
+                style: TextStyle(color: Colors.green),
+              ),
+              onPressed: () {},
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deconnexionDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Déconnexion"),
+          content: Text("Voulez-vous vraiment vous déconnecter ?"),
+          actions: [
+            TextButton(
+              child: const Text(
+                'Oui',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                _deconnexion(context);
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'NON',
+                style: TextStyle(color: Colors.green),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // fermer dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: vertBackground,
+        appBar: AppBar(
+          title: Text("Profil"),
+          centerTitle: true,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  conseilDialog();
+                },
+                icon: Icon(
+                  Icons.info,
+                  color: vert,
+                )),
+            SizedBox(
+              width: 10,
+            )
+          ],
+        ),
         body: FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
                 .collection('users')
@@ -52,7 +138,11 @@ class _ProfilPageState extends State<ProfilPage>
                 return Text("Error : ${snapshot.error}");
               }
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: vert,
+                  ),
+                );
               }
               if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                 return const Text("No data found");
@@ -65,178 +155,80 @@ class _ProfilPageState extends State<ProfilPage>
                   itemBuilder: (context, index) {
                     final userDataFields = userData[index];
 
-                    final nomComplet = userDataFields['nomComplet'] as String? ?? '';
+                    final nomComplet =
+                        userDataFields['nomComplet'] as String? ?? '';
                     final email = userDataFields['email'] as String? ?? '';
-                    final telephone = userDataFields['telephone'] as String? ?? '';
-                    
+                    final telephone =
+                        userDataFields['telephone'] as String? ?? '';
+
                     return Padding(
-                      padding: EdgeInsets.only(top: 30, left: 8, right: 8),
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                                "Profil",
-                                style: TextStyle(color: noir, fontSize: 20),
+                          ListTile(
+                            title: Text.rich(TextSpan(text: "NOM: ", children: [
+                              TextSpan(
+                                text: "$nomComplet",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              )
+                            ])),
+                          ),
+                          ListTile(
+                            title: Text.rich(TextSpan(text: "TELEPHONE: ", children: [
+                              TextSpan(
+                                text: "$telephone",
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              )
+                            ])),
+                          ),
+                          ListTile(
+                            title: Text.rich(TextSpan(
+                              text: "EMAIL: ",
+                              children: [
+                                TextSpan(text: "$email", style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold
+                                ),)
+                            ]) ),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return const ModifierProfilPage();
+                              }));
+                            },
+                            child: Text(
+                              "Modifier le Profil",
+                              style: TextStyle(
+                                color: vert,
+                                fontWeight: FontWeight.bold,
+                                decoration: TextDecoration.underline,
+                                fontSize: 20,
                               ),
-                              SizedBox(
-                                height: 20,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          MaterialButton(
+                              color: vert,
+                              child: Text(
+                                "Se Déconnecter",
+                                style: TextStyle(color: Colors.white),
                               ),
-                              Form(
-                                  key: formKey,
-                                  child: Column(
-                                    children: [
-                                      TextFiedWiget(
-                                        labelText: 'Nom Complet',
-                                        hintTexte: nomComplet,
-                                        controlleur: _nomCompletController,
-                                        validateur: (valeur) {
-                                          if (valeur == null ||
-                                              valeur.isEmpty) {
-                                            return 'Veuillez entrer votre nom complet';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      TextFiedWiget(
-                                        labelText: 'Numero de Telephone',
-                                        hintTexte: telephone,
-                                        controlleur: _telephoneController,
-                                        validateur: (valeur) {
-                                          if (valeur == null ||
-                                              valeur.isEmpty) {
-                                            return 'Veuillez entrer votre numero de telephone';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      chargement
-                                          ? LinearProgressIndicator()
-                                          : MaterialButton(
-                                              height: 50,
-                                              minWidth: 250,
-                                              color: vert,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              onPressed: () {
-                                                if (formKey.currentState!
-                                                    .validate()) {}
-                                              },
-                                              child: Text(
-                                                "Modifier",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 20),
-                                              )),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      MaterialButton(
-        child: Text("Quitter"),
-        onPressed: (){
-          FirebaseAuth.instance.signOut();
-          Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (builder) =>  OnBoardingPage(),
-      ),
-    );
-  
-      })
-                                    ],
-                                  )),
-                    //         
+                              onPressed: () {
+                                deconnexionDialog();
+                              })
                         ],
                       ),
                     );
-                    // Padding(
-                    //   padding: EdgeInsets.only(top: 30, left: 8, right: 8),
-                    //   child: ListView(
-                    //     children: [
-                    //       Column(
-                    //         children: [
-                    //           Text(
-                    //             "Profil",
-                    //             style: TextStyle(color: noir, fontSize: 20),
-                    //           ),
-                    //           SizedBox(
-                    //             height: 20,
-                    //           ),
-                    //           Form(
-                    //               key: formKey,
-                    //               child: Column(
-                    //                 children: [
-                    //                   TextFiedWiget(
-                    //                     labelText: 'Nom Complet',
-                    //                     hintTexte: 'Nom Complet',
-                    //                     controlleur: _nomCompletController,
-                    //                     validateur: (valeur) {
-                    //                       if (valeur == null ||
-                    //                           valeur.isEmpty) {
-                    //                         return 'Veuillez entrer votre nom complet';
-                    //                       }
-                    //                       return null;
-                    //                     },
-                    //                   ),
-                    //                   SizedBox(
-                    //                     height: 10,
-                    //                   ),
-                    //                   SizedBox(
-                    //                     height: 10,
-                    //                   ),
-                    //                   TextFiedWiget(
-                    //                     labelText: 'Numero de Telephone',
-                    //                     hintTexte: 'Numero de Telephone',
-                    //                     controlleur: _telephoneController,
-                    //                     validateur: (valeur) {
-                    //                       if (valeur == null ||
-                    //                           valeur.isEmpty) {
-                    //                         return 'Veuillez entrer votre numero de telephone';
-                    //                       }
-                    //                       return null;
-                    //                     },
-                    //                   ),
-                    //                   SizedBox(
-                    //                     height: 15,
-                    //                   ),
-                    //                   chargement
-                    //                       ? LinearProgressIndicator()
-                    //                       : MaterialButton(
-                    //                           height: 50,
-                    //                           minWidth: 250,
-                    //                           color: vert,
-                    //                           shape: RoundedRectangleBorder(
-                    //                             borderRadius:
-                    //                                 BorderRadius.circular(10),
-                    //                           ),
-                    //                           onPressed: () {
-                    //                             if (formKey.currentState!
-                    //                                 .validate()) {}
-                    //                           },
-                    //                           child: Text(
-                    //                             "Modifier",
-                    //                             style: TextStyle(
-                    //                                 color: Colors.white,
-                    //                                 fontSize: 20),
-                    //                           )),
-                    //                   SizedBox(
-                    //                     height: 15,
-                    //                   ),
-                    //                 ],
-                    //               )),
-                    //         ],
-                    //       )
-                    //     ],
-                    //   ),
-                    // );
                   });
             }));
   }
