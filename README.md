@@ -6,3 +6,11 @@ Voici la consigne qui nous a été donné :
 ## Screenshots 
 ![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215239-portrait.png)
 ![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215256-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215304-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215057-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215214-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215112-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215122-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215128-portrait.png)
+![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215348-portrait.png)
+
