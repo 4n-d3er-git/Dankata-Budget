@@ -13,6 +13,11 @@ Voici la consigne qui nous a été donné :
 ![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215122-portrait.png)
 ![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215128-portrait.png)
 ![screenshot](https://github.com/4n-d3er-git/Gestion-de-Budget/blob/main/assets/Screenshot_20240504-215348-portrait.png)
+**NB**: Nous l'avons fait en seulement une semaine.
+## Technologies Utilisées 
+- Dart
+- Flutter
+- Firebase
 ## Packages Utilisés 📦 
 - firebase_core
 - firebase_auth
@@ -20,4 +25,7 @@ Voici la consigne qui nous a été donné :
 - fl_chart
 - shared_preferences
 - video_player
-  
+## Remerciements 🙏🏾❤️
+En plus des concepts que nous avons appris pendant la formation ce projet nous a permis d'apprendre et de mettre en pratique d'autres concepts et technologies que bous ne connaissions pas auparavant.
+Nous remercions grandement **ORANGE DIGITAL CENTER GUINÉE** pour cette formation et l'occasion qu'ils nous ont donné d'exprimer notre passion.
+Merci également à pour son design que nous avons trouvé sur et duquel nous nous sommes inspiré.
