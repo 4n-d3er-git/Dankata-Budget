@@ -26,6 +26,7 @@ Voici la consigne qui nous a été donné :
 - shared_preferences
 - video_player
 ## Remerciements 🙏🏾❤️
-En plus des concepts que nous avons appris pendant la formation ce projet nous a permis d'apprendre et de mettre en pratique d'autres concepts et technologies que bous ne connaissions pas auparavant.
+En plus des concepts que nous avons appris pendant la formation, ce projet nous a permis d'apprendre et de mettre en pratique d'autres concepts et technologies que nous ne connaissions pas auparavant.
 Nous remercions grandement **ORANGE DIGITAL CENTER GUINÉE** pour cette formation et l'occasion qu'ils nous ont donné d'exprimer notre passion.
-Merci également à pour son design que nous avons trouvé sur et duquel nous nous sommes inspiré.
+
+Merci également à [Arun kumar N](https://www.behance.net/arunkumar207) pour son design que nous avons trouvé sur et duquel nous nous sommes inspiré [Design Gestion de Budget](https://www.behance.net/gallery/195082819/Income-Expense-Tracking-App?tracking_source=search_projects%7CBudget+App&l=46&log_shim_removal=1).
