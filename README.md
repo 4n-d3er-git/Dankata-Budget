@@ -30,3 +30,5 @@ En plus des concepts que nous avons appris pendant la formation, ce projet nous 
 Nous remercions grandement **ORANGE DIGITAL CENTER GUINÉE** pour cette formation et l'occasion qu'ils nous ont donné d'exprimer notre passion.
 
 Merci également à [Arun kumar N](https://www.behance.net/arunkumar207) pour son design que nous avons trouvé sur *Behance* et duquel nous nous sommes inspiré [Incomes & Expenses Tracking App](https://www.behance.net/gallery/195082819/Income-Expense-Tracking-App?tracking_source=search_projects%7CBudget+App&l=46&log_shim_removal=1).
+
+Merci surtout à notre formateur @Donzo24 pour ce monde passionnant qu'il nous à fait découvrir. 🙏🏾
