@@ -1,4 +1,3 @@
-import 'package:budget_odc/Page/onBoarding/on_boarding_page.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
@@ -6,7 +5,6 @@ import 'package:budget_odc/widgets/textfield_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ModifierProfilPage extends StatefulWidget {
   const ModifierProfilPage({super.key});
@@ -23,7 +21,7 @@ class _ModifierProfilPageState extends State<ModifierProfilPage>
   final formKey = GlobalKey<FormState>();
 
   bool chargement = false;
-  String? currUserEmail = FirebaseAuth.instance.currentUser!.email;
+  String? emailUtilisateur = FirebaseAuth.instance.currentUser!.email;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -67,7 +65,7 @@ setState(() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: vertBackground,
+        backgroundColor: blancBackground,
         appBar: AppBar(
           title: Text(
             "Modifier le Profil",
@@ -77,7 +75,7 @@ setState(() {
         body: FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
                 .collection('users')
-                .where('email', isEqualTo: currUserEmail)
+                .where('email', isEqualTo: emailUtilisateur)
                 .get(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
@@ -177,86 +175,7 @@ setState(() {
                         ],
                       ),
                     );
-                    // Padding(
-                    //   padding: EdgeInsets.only(top: 30, left: 8, right: 8),
-                    //   child: ListView(
-                    //     children: [
-                    //       Column(
-                    //         children: [
-                    //           Text(
-                    //             "Profil",
-                    //             style: TextStyle(color: noir, fontSize: 20),
-                    //           ),
-                    //           SizedBox(
-                    //             height: 20,
-                    //           ),
-                    //           Form(
-                    //               key: formKey,
-                    //               child: Column(
-                    //                 children: [
-                    //                   TextFiedWiget(
-                    //                     labelText: 'Nom Complet',
-                    //                     hintTexte: 'Nom Complet',
-                    //                     controlleur: _nomCompletController,
-                    //                     validateur: (valeur) {
-                    //                       if (valeur == null ||
-                    //                           valeur.isEmpty) {
-                    //                         return 'Veuillez entrer votre nom complet';
-                    //                       }
-                    //                       return null;
-                    //                     },
-                    //                   ),
-                    //                   SizedBox(
-                    //                     height: 10,
-                    //                   ),
-                    //                   SizedBox(
-                    //                     height: 10,
-                    //                   ),
-                    //                   TextFiedWiget(
-                    //                     labelText: 'Numero de Telephone',
-                    //                     hintTexte: 'Numero de Telephone',
-                    //                     controlleur: _telephoneController,
-                    //                     validateur: (valeur) {
-                    //                       if (valeur == null ||
-                    //                           valeur.isEmpty) {
-                    //                         return 'Veuillez entrer votre numero de telephone';
-                    //                       }
-                    //                       return null;
-                    //                     },
-                    //                   ),
-                    //                   SizedBox(
-                    //                     height: 15,
-                    //                   ),
-                    //                   chargement
-                    //                       ? LinearProgressIndicator()
-                    //                       : MaterialButton(
-                    //                           height: 50,
-                    //                           minWidth: 250,
-                    //                           color: vert,
-                    //                           shape: RoundedRectangleBorder(
-                    //                             borderRadius:
-                    //                                 BorderRadius.circular(10),
-                    //                           ),
-                    //                           onPressed: () {
-                    //                             if (formKey.currentState!
-                    //                                 .validate()) {}
-                    //                           },
-                    //                           child: Text(
-                    //                             "Modifier",
-                    //                             style: TextStyle(
-                    //                                 color: Colors.white,
-                    //                                 fontSize: 20),
-                    //                           )),
-                    //                   SizedBox(
-                    //                     height: 15,
-                    //                   ),
-                    //                 ],
-                    //               )),
-                    //         ],
-                    //       )
-                    //     ],
-                    //   ),
-                    // );
+                   
                   });
             }));
   }

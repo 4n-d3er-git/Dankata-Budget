@@ -49,7 +49,7 @@ class _MotDePassOublieState extends State<MotDePassOublie> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: vertBackground,
+      backgroundColor: blancBackground,
       body: SafeArea(
           child: Padding(
               padding: EdgeInsets.all(8),

@@ -1,6 +1,4 @@
 import 'package:budget_odc/Page/auth_Page/connexion.dart';
-import 'package:budget_odc/Page/home_Page/home_page.dart';
-import 'package:budget_odc/models/auth.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:budget_odc/widgets/bottomnevbar.dart';
 import 'package:budget_odc/widgets/chargement.dart';
@@ -9,6 +7,7 @@ import 'package:budget_odc/widgets/textfield_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Inscription extends StatefulWidget {
   const Inscription({Key? key}) : super(key: key);
@@ -25,8 +24,6 @@ class _InscriptionState extends State<Inscription> {
   TextEditingController _confirmerMotDePassController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  bool obscurcir = true;
-  bool obscurcir1 = true;
   bool chargement = false;
 
   @override
@@ -39,7 +36,8 @@ class _InscriptionState extends State<Inscription> {
     super.dispose();
   }
 
-  Future addUserDetails(
+// ajouter les details de l'utilisateurs dans la base de donnee
+  Future ajouterDetailsUtilisateurs(
     String nom,
     String email,
     String telephone,
@@ -67,15 +65,21 @@ class _InscriptionState extends State<Inscription> {
         chargement = true;
       });
       try {
+        // creer le compte de l'utilisateur
         await FirebaseAuth.instance
             .createUserWithEmailAndPassword(email: email, password: motdepass);
-        addUserDetails(
+        ajouterDetailsUtilisateurs(
           nom,
           email,
           telephone,
         );
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+        // Stockage de l'état de connexion dans SharedPreferences
+        //cache
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLoggedIn', true);
+        // naviguer vers la page principale
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (context) {
           return BottomNavBar();
         }));
         montrerSnackBar("Bienveu dans ...", context);
@@ -84,12 +88,13 @@ class _InscriptionState extends State<Inscription> {
         _telephoneController.clear();
         _motDePasseController.clear();
         _confirmerMotDePassController.clear();
+        // gestion des exceptions
       } on FirebaseAuthException catch (e) {
-        //print(e.code);
         if (e.code == 'weak-password') {
           montrerErreurSnackBar("Mot de pass trop court", context);
         } else if (e.code == 'email-already-in-use') {
-          montrerErreurSnackBar("Un utilisateur existe déjà avec cet email", context);
+          montrerErreurSnackBar(
+              "Un utilisateur existe déjà avec cet email", context);
         } else if (e.code == 'invalid-email') {
           montrerErreurSnackBar("Cette adresse email est incorrect", context);
         } else if (e.code == 'user-not-found') {
@@ -109,8 +114,10 @@ class _InscriptionState extends State<Inscription> {
         } else if (e.code == 'account-exists-with-different-credential') {
           montrerErreurSnackBar("Erreur Inconnue", context);
         } else if (e.code == 'network-request-failed') {
-          montrerErreurSnackBar("impossible de se connecter, veuillez vérifier votre connexion intrnet puis reessayer",context);
-                }
+          montrerErreurSnackBar(
+              "impossible de se connecter, veuillez vérifier votre connexion intrnet puis reessayer",
+              context);
+        }
       } catch (e) {
         montrerSnackBar("$e", context);
       } finally {
@@ -118,68 +125,30 @@ class _InscriptionState extends State<Inscription> {
           chargement = false;
         });
       }
-    } 
+    }
+    // gestion des erreurs
     else if (nom.isEmpty) {
-      montrerErreurSnackBar("Veuillez entrer votre nom complet",  context);
+      montrerErreurSnackBar("Veuillez entrer votre nom complet", context);
     } else if (email.isEmpty) {
       montrerErreurSnackBar("Veuillez entrer votre Email", context);
     } else if (!email.contains('@')) {
       montrerErreurSnackBar("Veullez entrer un email valide", context);
     } else if (telephone.isEmpty) {
-      montrerErreurSnackBar("veuillez entrer votre numero de telephone", context);
+      montrerErreurSnackBar(
+          "veuillez entrer votre numero de telephone", context);
     } else if (motdepass.isEmpty) {
       montrerErreurSnackBar("Veuillez entrer votre mot de pass", context);
     } else if (motdepass != cmotdepass) {
-      montrerErreurSnackBar("Les deux mots de pass ne correspondent pas, veuillez corriger puis reesyer", context);
+      montrerErreurSnackBar(
+          "Les deux mots de pass ne correspondent pas, veuillez corriger puis reesyer",
+          context);
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-    // soumissionInscription() async {
-    //   setState(() {
-    //     chargement = true;
-    //   });
-    //   String reponse = await Authentification().creerUnCompte(
-    //     email: _emailController.text,
-    //     password: _motDePasseController.text, context: context,
-    //   );
-    //   if(reponse == "accomplie"){
-    //   }
-    //   else{
-    //     // montrerSnackBar("Une erreur s'est produite", context);
-    //     setState(() {
-    //     chargement = false;
-    //   });
-    //   }
-
-    // }
-    // sousmissionInformations() async {
-    //   setState(() {
-    //     chargement = true;
-    //   });
-    //   String reponse = await Authentification().informationComplete(
-    //     context: context,
-    //     nomComple: _nomCompletController.text.trim(),
-    //     email: _emailController.text.trim(),
-    //     telepone: _telephoneController.text.trim(),
-    //   );
-    //   if (reponse == 'accomplie') {
-    //     setState(() {
-    //       chargement = false;
-    //     });
-    //     montrerSnackBar("Compte créé avec succès.\nBienvenu dans ...", context);
-    //     Navigator.of(context).pushReplacement(
-    //       MaterialPageRoute(
-    //         builder: (context) => HomePage(),
-    //       ),
-    //     );
-    //   }
-    // }
     return Scaffold(
-      backgroundColor: vertBackground,
+      backgroundColor: blancBackground,
       body: SafeArea(
           child: Padding(
               padding: EdgeInsets.all(8),
@@ -294,15 +263,12 @@ class _InscriptionState extends State<Inscription> {
                                         onPressed: () {
                                           if (formKey.currentState!
                                               .validate()) {
-                                                registerUser();
+                                            registerUser();
                                             print(
                                                 "${_nomCompletController.text}, ${_emailController.text}, ${_telephoneController.text}, ${_motDePasseController.text}");
-                                          
-                                              }
-                                          
-                                           else {
+                                          } else {
                                             print("non valide");
-                                            }
+                                          }
                                         },
                                         child: Text(
                                           "S'inscrire",

@@ -26,7 +26,7 @@ class OnBoardingState extends StatelessWidget {
           child: Image.asset(
             image,
             width: double.infinity,
-            height: 200,
+            height: 250,
           ),
         ),
         SizedBox(
@@ -37,7 +37,6 @@ class OnBoardingState extends StatelessWidget {
             children: [
               Text(
                 titre,
-                // textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,

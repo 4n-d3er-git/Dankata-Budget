@@ -23,11 +23,11 @@ class _AjouterMoisState extends State<AjouterMois> {
   DateTimeRange plageChoisi =
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
 
-String? userEmail ="";
+String? emailUtilisateur ="";
 bool chargement = false;
       @override
   void initState() {
-        userEmail = FirebaseAuth.instance.currentUser?.email;
+        emailUtilisateur = FirebaseAuth.instance.currentUser?.email;
         _descriptionDesCategories = [];
     _montantDeCategorie = [];
 
@@ -46,10 +46,8 @@ bool chargement = false;
     super.dispose();
   }
 
-void sendBudget(BuildContext context) async {
-  // final nobreCat = _nombreDeCategorieController.text.trim();
-  // final description = _descriptionDesCategories;
-  // final montant = _montantDeCategorie;
+void ajouterBudgets(BuildContext context) async {
+  
   final titre = _titreController.text.trim();
   final nobreCat = int.tryParse(_nombreDeCategorieController.text.trim()) ?? 0;
   final description = _descriptionDesCategories.map((controller) => controller.text.trim()).toList();
@@ -82,7 +80,7 @@ for (int i = 0; i < _nombreDeCategories; i++) {
         'descriptions': description,
         'nombre': nobreCat,
         'montants': montant,
-        'email': userEmail,
+        'email': emailUtilisateur,
         'type': 'mois',
       };
 print("Nombre de descriptions: ${description.length}");
@@ -118,7 +116,7 @@ print('$titre');
 setState(() {
   chargement =false;
 });
-  print("$montant, $nobreCat, userEmail: $userEmail");
+  print("$montant, $nobreCat, emailUtilisateur: $emailUtilisateur");
 }
   @override
   Widget build(BuildContext context) {
@@ -158,7 +156,7 @@ setState(() {
           ),
         ],
         title: Text(
-          "Budget Mensuel", //style: TextStyle(fontSize: 13),
+          "Budget Mensuel", 
         ),
       ),
       body: ListView(
@@ -185,11 +183,7 @@ setState(() {
                       keyboardType: TextInputType.number,
                       controller: _titreController,
                       cursorColor: vert,
-                      // onChanged: (value) {
-                      //   setState(() {
-                      //     _nombreDeCategories = int.tryParse(value) ?? 0;
-                      //   });
-                      // },
+                      
                     ),
                   ),
                   SizedBox(height: 15,),
@@ -221,6 +215,7 @@ setState(() {
                   ),
                   MaterialButton(
                     onPressed: () {
+
                       _descriptionDesCategories.clear();
                       for (int i = 0; i < _nombreDeCategories; i++) {
                         _descriptionDesCategories.add(TextEditingController());
@@ -307,7 +302,7 @@ setState(() {
                       montrerErreurSnackBar(
                           "vous devez choisir au moins 30 jours", context);
                     } else {
-                     sendBudget  (context);  }
+                     ajouterBudgets  (context);  }
 
                   },
                   child: Text(

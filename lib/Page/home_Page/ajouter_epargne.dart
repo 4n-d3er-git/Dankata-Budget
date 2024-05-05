@@ -3,9 +3,7 @@ import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class AjouterEpargne extends StatefulWidget {
   const AjouterEpargne({super.key});
@@ -18,15 +16,14 @@ class _AjouterEpargneState extends State<AjouterEpargne> {
   late TextEditingController _objectifController;
   late TextEditingController _montantController;
 
-  DateTime _selectedDate = DateTime.now();
-String? userEmail = '';
+String? emailUtilisateur = '';
 bool chargement = false;
   @override
   void initState() {
     super.initState();
     _objectifController = TextEditingController();
     _montantController = TextEditingController();
-  userEmail = FirebaseAuth.instance.currentUser?.email;
+  emailUtilisateur = FirebaseAuth.instance.currentUser?.email;
   }
 
   String documentId = '';
@@ -56,7 +53,7 @@ bool chargement = false;
       final donneesRevenu = {
         'montant': double.parse(montant),
         'objectifs': objectif,
-        'email': userEmail,
+        'email': emailUtilisateur,
         "type": "epargne",
         "date": DateTime.now()
       };
@@ -83,15 +80,15 @@ bool chargement = false;
         });
       }
 
-  print("$montant, $objectif $documentId, userEmail: $userEmail");
+  print("$montant, $objectif $documentId, emailUtilisateur: $emailUtilisateur");
 }
 //!
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: vertBackground,
+      backgroundColor: blancBackground,
       appBar: AppBar(
-        backgroundColor: vertBackground,
+        backgroundColor: blancBackground,
         title: Text("Epargne"),
       ),
       body: Padding(

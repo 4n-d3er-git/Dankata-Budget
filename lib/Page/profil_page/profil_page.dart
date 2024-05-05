@@ -5,7 +5,6 @@ import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilPage extends StatefulWidget {
@@ -42,7 +41,7 @@ class _ProfilPageState extends State<ProfilPage> {
     }
   }
 
-  String? currUserEmail = FirebaseAuth.instance.currentUser!.email;
+  String? emailUtilisateur = FirebaseAuth.instance.currentUser!.email;
 
   void conseilDialog() {
     showDialog(
@@ -112,6 +111,7 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text("Profil"),
           centerTitle: true,
           actions: [
@@ -131,7 +131,7 @@ class _ProfilPageState extends State<ProfilPage> {
         body: FutureBuilder<QuerySnapshot>(
             future: FirebaseFirestore.instance
                 .collection('users')
-                .where('email', isEqualTo: currUserEmail)
+                .where('email', isEqualTo: emailUtilisateur)
                 .get(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {

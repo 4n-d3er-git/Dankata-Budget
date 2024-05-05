@@ -155,12 +155,7 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                       montantTotal +=
                           montants.fold(0, (prev, montant) => prev + montant);
                     }
-                    // for (var budget in budgets) {
-                    //   List<double> montants =
-                    //       List<double>.from(budget['montants']);
-                    //   montantTotal +=
-                    //       montants.fold(0, (prev, montant) => prev + montant);
-                    // }
+                  
 
                     return Text.rich(TextSpan(
                       text: "GNF ",
@@ -239,7 +234,7 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                       itemBuilder: (context, index) {
                         var budget = budgetsFiltres[index].data();
 
-                        // var budget = budgets[index].data();
+                        
 // Extraire la plage de dates
                         DateTime debut = budget['plagedate']['start'].toDate();
                         DateTime fin = budget['plagedate']['end'].toDate();
@@ -266,7 +261,7 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Afficher chaque description avec son montant correspondant
-                            for (int i = 0; i < descriptions.length; i++)
+                            // for (int i = 0; i < descriptions.length; i++)
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -293,15 +288,13 @@ class _BudgetSemaineState extends State<BudgetSemaine>
                                         onTap: () {
                                           afficherDetailBudget(context, budget);
                                         },
-                                        // title: Text("${descriptions[i]}"),
-                                        // trailing: Text("${montants[i]}"),
+                                        
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            // Afficher le montant total
-                            // Text('Montant total: $montantTotal'),
+                           
                           ],
                         );
                       },

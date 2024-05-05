@@ -1,10 +1,8 @@
 import 'package:budget_odc/Page/budget_page/budget_annee/ajouter_budget_annee.dart';
-import 'package:budget_odc/Page/budget_page/budget_semaine/ajouter_budget_semain.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class BudgetAnne extends StatefulWidget {
   const BudgetAnne({super.key});
@@ -22,13 +20,13 @@ class _BudgetAnneState extends State<BudgetAnne>
   Future<void> choisirPlageDeDates() async {
     final plage = await showDateRangePicker(
       helpText: "selectionnez une plage de date",
-                    cancelText: "Quitter",
-                    fieldEndHintText: "Date de Fin",
-                    fieldStartHintText: "Date de Début",
-                    fieldEndLabelText: "Selectionnez une ",
-                    fieldStartLabelText: "Selectionnez une ",
-                    confirmText: "Confirmer",
-                    saveText: "confirmer",
+      cancelText: "Quitter",
+      fieldEndHintText: "Date de Fin",
+      fieldStartHintText: "Date de Début",
+      fieldEndLabelText: "Selectionnez une ",
+      fieldStartLabelText: "Selectionnez une ",
+      confirmText: "Confirmer",
+      saveText: "confirmer",
       context: context,
       firstDate: DateTime(2022),
       lastDate: DateTime(2025),
@@ -67,7 +65,8 @@ class _BudgetAnneState extends State<BudgetAnne>
         List<double> montants = List<double>.from(budget['montants']);
         String titre = budget['titre'];
         // Calculer le total des montants
-  double montantTotal = montants.fold(0, (prev, montant) => prev + montant);
+        double montantTotal =
+            montants.fold(0, (prev, montant) => prev + montant);
         return AlertDialog(
           title: Text("Détails du Budget"),
           content: ListView(
@@ -76,7 +75,9 @@ class _BudgetAnneState extends State<BudgetAnne>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(titre, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+                  Text(titre,
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
                   Text(
                       "Du ${debut.day}/${debut.month}/${debut.year} Au ${fin.day}/${fin.month}/${fin.year}"),
                   for (int i = 0; i < descriptions.length; i++)
@@ -104,7 +105,10 @@ class _BudgetAnneState extends State<BudgetAnne>
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             backgroundColor: vert,
-            child: Icon(Icons.add, color: Colors.white,),
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.push(
                   context,
@@ -132,11 +136,15 @@ class _BudgetAnneState extends State<BudgetAnne>
                 StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('budget')
-                      .where('type',isEqualTo: 'annee').where('email',isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                      .where('type', isEqualTo: 'annee')
+                      .where('email',
+                          isEqualTo: FirebaseAuth.instance.currentUser!.email)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
-                      return CircularProgressIndicator(color: vert,);
+                      return CircularProgressIndicator(
+                        color: vert,
+                      );
                     }
 
                     var budgets = snapshot.data!.docs;
@@ -156,13 +164,8 @@ class _BudgetAnneState extends State<BudgetAnne>
                       montantTotal +=
                           montants.fold(0, (prev, montant) => prev + montant);
                     }
-                    // for (var budget in budgets) {
-                    //   List<double> montants =
-                    //       List<double>.from(budget['montants']);
-                    //   montantTotal +=
-                    //       montants.fold(0, (prev, montant) => prev + montant);
-                    // }
-
+                   
+                    // Afficher le montant total
                     return Text.rich(TextSpan(
                       text: "GNF ",
                       style: TextStyle(color: Colors.white, fontSize: 15),
@@ -196,14 +199,19 @@ class _BudgetAnneState extends State<BudgetAnne>
               ],
             ),
           ),
+          // Afficher les budgets
           StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('budget')
-                  .where('type',isEqualTo: 'annee').where('email',isEqualTo: FirebaseAuth.instance.currentUser!.email)
+              stream: FirebaseFirestore.instance
+                  .collection('budget')
+                  .where('type', isEqualTo: 'annee')
+                  .where('email',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.email)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return CircularProgressIndicator(color: vert,);
+                  return CircularProgressIndicator(
+                    color: vert,
+                  );
                 }
 
                 var budgets = snapshot.data!.docs;
@@ -223,6 +231,7 @@ class _BudgetAnneState extends State<BudgetAnne>
                       montants.fold(0, (prev, montant) => prev + montant);
                 }
 
+
                 return Positioned(
                   top: 150,
                   child: Container(
@@ -240,8 +249,7 @@ class _BudgetAnneState extends State<BudgetAnne>
                       itemBuilder: (context, index) {
                         var budget = budgetsFiltres[index].data();
 
-                        // var budget = budgets[index].data();
-// Extraire la plage de dates
+                        // Extraire les informations du budget
                         DateTime debut = budget['plagedate']['debut'].toDate();
                         DateTime fin = budget['plagedate']['fin'].toDate();
                         // Extraire les descriptions et les montants
@@ -267,7 +275,7 @@ class _BudgetAnneState extends State<BudgetAnne>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // Afficher chaque description avec son montant correspondant
-                            for (int i = 0; i < descriptions.length; i++)
+                            // for (int i = 0; i < descriptions.length; i++)
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -294,15 +302,13 @@ class _BudgetAnneState extends State<BudgetAnne>
                                         onTap: () {
                                           afficherDetailBudget(context, budget);
                                         },
-                                        // title: Text("${descriptions[i]}"),
-                                        // trailing: Text("${montants[i]}"),
+                                        
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            // Afficher le montant total
-                            // Text('Montant total: $montantTotal'),
+                            
                           ],
                         );
                       },

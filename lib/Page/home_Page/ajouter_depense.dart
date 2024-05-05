@@ -3,9 +3,7 @@ import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class AjouterDepense extends StatefulWidget {
   const AjouterDepense({super.key});
@@ -25,11 +23,11 @@ class _AjouterDepenseState extends State<AjouterDepense> {
     'Nourriture',
     'Vêtements',
     'Autres',
-  ]; // List of options
+  ]; // Liste des options
 
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-String? userEmail = '';
+String? emailUtilisateur = '';
   @override
   void initState() {
     super.initState();
@@ -37,7 +35,7 @@ String? userEmail = '';
     _timeController = TextEditingController();
     _categoryController = TextEditingController();
     _montantController = TextEditingController();
-  userEmail = FirebaseAuth.instance.currentUser?.email;
+  emailUtilisateur = FirebaseAuth.instance.currentUser?.email;
   }
 
   String documentId = '';
@@ -51,7 +49,7 @@ String? userEmail = '';
     super.dispose();
   }
 
-  void _showOptionsBottomSheet(BuildContext context) {
+  void _montrerOptionsBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -74,7 +72,7 @@ String? userEmail = '';
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectionnerDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
@@ -90,7 +88,7 @@ String? userEmail = '';
     }
   }
 
-  Future<void> _selectTime(BuildContext context) async {
+  Future<void> _selectionnerTemps(BuildContext context) async {
     final TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
@@ -103,13 +101,13 @@ String? userEmail = '';
     }
   }
 
-  String? selectedValue;
+  String? compteSelectionne;
 bool chargement = false;
    //!
   void onPressedD(BuildContext context) async {
   final montant = _montantController.text.trim();
   final categorie = _categoryController.text.trim();
-  final compte = selectedValue.toString();
+  final compte = compteSelectionne.toString();
   final heure = _selectedTime.toString();
   final date = _selectedDate.toString();
   String type = 'depense';
@@ -126,7 +124,7 @@ chargement = true;
         // 'time': _selectedTime,
         'category': categorie,
         'compte': compte,
-        'email': userEmail,
+        'email': emailUtilisateur,
         'type': type,
       };
 
@@ -154,15 +152,15 @@ chargement = true;
     });
   }
 
-  print("$montant, $categorie, $compte, $heure, $date? $documentId, userEmail: $userEmail");
+  print("$montant, $categorie, $compte, $heure, $date? $documentId, emailUtilisateur: $emailUtilisateur");
 }
 //!
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: vertBackground,
+      backgroundColor: blancBackground,
       appBar: AppBar(
-        backgroundColor: vertBackground,
+        backgroundColor: blancBackground,
         title: Text("Dépense"),
       ),
       body: Padding(
@@ -181,7 +179,7 @@ chargement = true;
                   ),
                   GestureDetector(
                     onTap: () {
-                      _selectDate(context);
+                      _selectionnerDate(context);
                     },
                     child: Container(
                         width: 110,
@@ -207,7 +205,7 @@ chargement = true;
                   ),
                   GestureDetector(
                     onTap: () {
-                      _selectTime(context);
+                      _selectionnerTemps(context);
                     },
                     child: Container(
                         width: 110,
@@ -280,7 +278,7 @@ chargement = true;
                   ),
                   GestureDetector(
                       onTap: () {
-                        _showOptionsBottomSheet(context);
+                        _montrerOptionsBottomSheet(context);
                       },
                       child: Container(
                           height: 50,
@@ -312,21 +310,21 @@ chargement = true;
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedValue = 'compte';
+                        compteSelectionne = 'compte';
                       });
                     },
                     child: Container(
                       padding: EdgeInsets.all(8),
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: selectedValue == 'compte' ? rouge : Colors.white,
+                        color: compteSelectionne == 'compte' ? rouge : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Compte',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selectedValue == 'compte'
+                          color: compteSelectionne == 'compte'
                               ? Colors.white
                               : Colors.black,
                         ),
@@ -336,21 +334,21 @@ chargement = true;
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedValue = 'cash';
+                        compteSelectionne = 'cash';
                       });
                     },
                     child: Container(
                       padding: EdgeInsets.all(8),
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: selectedValue == 'cash' ? rouge : Colors.white,
+                        color: compteSelectionne == 'cash' ? rouge : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Cash',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selectedValue == 'cash'
+                          color: compteSelectionne == 'cash'
                               ? Colors.white
                               : Colors.black,
                         ),
@@ -360,21 +358,21 @@ chargement = true;
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedValue = 'carte';
+                        compteSelectionne = 'carte';
                       });
                     },
                     child: Container(
                       padding: EdgeInsets.all(8),
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: selectedValue == 'carte' ? rouge : Colors.white,
+                        color: compteSelectionne == 'carte' ? rouge : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Carte',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selectedValue == 'carte'
+                          color: compteSelectionne == 'carte'
                               ? Colors.white
                               : Colors.black,
                         ),

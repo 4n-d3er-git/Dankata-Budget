@@ -1,13 +1,10 @@
 import 'dart:math';
 
-import 'package:budget_odc/Page/onBoarding/on_boarding_page.dart';
 import 'package:budget_odc/theme/couleur.dart';
-import 'package:budget_odc/widgets/bottomnevbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/widgets.dart';
 
 
 class GraphiquePage extends StatefulWidget {
@@ -23,15 +20,7 @@ class _GraphiquePageState extends State<GraphiquePage>
 
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-//   Future<List<DocumentSnapshot>> fetchData() async {
-//   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-//       .collection('transaction')
-//       .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
-//       .where('type', isEqualTo: 'revenu')
-//       .get();
 
-//   return querySnapshot.docs;
-// }
 
 double calculTotalRevenu(List<DocumentSnapshot<Object?>> data) {
   double total = 0.0;
@@ -48,8 +37,7 @@ List<PieChartSectionData> sectionDeGraphe(List<DocumentSnapshot<Object?>> data, 
     double percentage = income / totalIncome * 100.0;
     sections.add(
       PieChartSectionData(
-        color:      getColorForCategory(doc['category']),
- // Vous pouvez personnaliser les couleurs si vous le souhaitez
+        color:      couleurParGategorie(doc['category']),
         value: percentage,
         title: '${doc['category']} (${percentage.toStringAsFixed(2)}%)',
         radius: 100,
@@ -58,7 +46,7 @@ List<PieChartSectionData> sectionDeGraphe(List<DocumentSnapshot<Object?>> data, 
   });
   return sections;
 }
-Future<List<DocumentSnapshot<Object?>>> getRevenuData() async {
+Future<List<DocumentSnapshot<Object?>>> recupererRevenus() async {
   QuerySnapshot<Object?> querySnapshot = await FirebaseFirestore.instance
       .collection('transaction')
       .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
@@ -67,7 +55,7 @@ Future<List<DocumentSnapshot<Object?>>> getRevenuData() async {
 
   return querySnapshot.docs;
 }
-Future<List<DocumentSnapshot<Object?>>> getDepenseData() async {
+Future<List<DocumentSnapshot<Object?>>> recupererDepenses() async {
   QuerySnapshot<Object?> querySnapshot = await FirebaseFirestore.instance
       .collection('transaction')
       .where('email', isEqualTo: FirebaseAuth.instance.currentUser!.email)
@@ -97,16 +85,8 @@ Widget depenseGraphe(List<DocumentSnapshot<Object?>> incomeData) {
     ),
   );
 }
-// Color getRandomColor() {
-//   Random random = Random();
-//   return Color.fromARGB(
-//     255,
-//     random.nextInt(256),
-//     random.nextInt(256),
-//     random.nextInt(256),
-//   );
-// }
-Color getColorForCategory(String category) {
+
+Color couleurParGategorie(String category) {
   List<int> colors = [
     Colors.blue.value,
     Colors.green.value,
@@ -125,29 +105,6 @@ Color getColorForCategory(String category) {
   int index = category.hashCode % colors.length;
   return Color(colors[index]);
 }
-// Widget buildPieChart(List<DocumentSnapshot> data) {
-//   // Convertir les données Firestore en une liste de Map
-//   List<Map<String, dynamic>> dataList = data
-//       .map((doc) => {'label': doc['category'], 'value': doc['montant']})
-//       .toList();
-
-//   return PieChart(
-//     PieChartData(
-//       sections: dataList.asMap().entries.map((entry) {
-//         return PieChartSectionData(
-//           color: Colors.accents[entry.key % Colors.accents.length],
-//           value: double.parse(entry.value['value'].toString()),
-//           title: entry.value['label'].toString(),
-//           radius: 100,
-//           showTitle: true,
-//         );
-//       }).toList(),
-//     ),
-//   );
-// }
-
-
-
 
   @override
   void initState() {
@@ -164,14 +121,17 @@ Color getColorForCategory(String category) {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text("Graphiques"),),
       body: 
       Column(
         children: [
           FutureBuilder<List<DocumentSnapshot<Object?>>>(
-            future: getRevenuData(),
+            future: recupererRevenus(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator(color: vert,));
+                return Center(/*child: CircularProgressIndicator(color: vert,)*/);
               } else {
                 if (snapshot.hasError || snapshot.data == null) {
                   return Center(child: Text('Erreur: ${snapshot.error}'));
@@ -182,11 +142,11 @@ Color getColorForCategory(String category) {
                   }
                 else {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 30,left: 80.0),
+                    padding: const EdgeInsets.only(left: 80.0),
                     child: Column(
                       
                       children: [
-                       Text("Grapique des Revenus", style: TextStyle(fontWeight: FontWeight.bold, 
+                       Text("Graphique des Revenus", style: TextStyle(fontWeight: FontWeight.bold, 
                        fontSize: 20
                        ),),
                         Container(
@@ -205,7 +165,7 @@ Color getColorForCategory(String category) {
           ),
           SizedBox(height: 20,),
           FutureBuilder<List<DocumentSnapshot<Object?>>>(
-            future: getDepenseData(),
+            future: recupererDepenses(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator(color: vert,));
@@ -217,11 +177,11 @@ Color getColorForCategory(String category) {
                 }
                 else {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 30,left: 80.0),
+                    padding: const EdgeInsets.only(left: 80.0),
                     child: Column(
                       
                       children: [
-                       Text("Grapique des Dépenses", style: TextStyle(fontWeight: FontWeight.bold, 
+                       Text("Graphique des Dépenses", style: TextStyle(fontWeight: FontWeight.bold, 
                        fontSize: 20
                        ),),
                         Container(
@@ -239,20 +199,7 @@ Color getColorForCategory(String category) {
           ),
         ],
       ),
-      // FutureBuilder(
-      //   future: fetchData(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.connectionState == ConnectionState.waiting) {
-      //       return Center(child: CircularProgressIndicator(color: vert,));
-      //     } else {
-      //       if (snapshot.hasError) {
-      //         return Center(child: Text('Erreur: ${snapshot.error}'));
-      //       } else {
-      //         return Center(child: buildPieChart(snapshot.data!));
-      //       }
-      //     }
-      //   },
-      // ),
+      
     );
   }
 }

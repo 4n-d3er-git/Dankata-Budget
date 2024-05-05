@@ -99,7 +99,7 @@
 //     Query transactionsQuery = FirebaseFirestore.instance
 //         .collection('transaction')
 //         .where('type', isEqualTo: 'epargne')
-//         .where('email', isEqualTo: currUserEmail);
+//         .where('email', isEqualTo: emailUtilisateur);
 
 //     if (_startDate != null && _endDate != null) {
 //       transactionsQuery = transactionsQuery

@@ -3,9 +3,7 @@ import 'package:budget_odc/widgets/chargement.dart';
 import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class AjouterRevenu extends StatefulWidget {
   const AjouterRevenu({Key? key}) : super(key: key);
@@ -27,7 +25,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
 
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  String? userEmail = '';
+  String? emailUtilisateur = '';
   @override
   void initState() {
     super.initState();
@@ -35,7 +33,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
     _timeController = TextEditingController();
     _categoryController = TextEditingController();
     _montantController = TextEditingController();
-    userEmail = FirebaseAuth.instance.currentUser?.email;
+    emailUtilisateur = FirebaseAuth.instance.currentUser?.email;
   }
 
   String documentId = '';
@@ -49,7 +47,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
     super.dispose();
   }
 
-  void _showOptionsBottomSheet(BuildContext context) {
+  void _montrerOptionsBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
@@ -63,7 +61,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
                   _categoryController.text = _options[index];
                 });
                 Navigator.pop(
-                    context); // Close the bottom sheet after selection
+                    context); // Fermer le bottom sheet apres la selection
               },
             );
           },
@@ -72,35 +70,8 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
     );
   }
 
-  // Future<void> _selectDate(BuildContext context) async {
-  //   final DateTime? pickedDate = await showDatePicker(
-  //     context: context,
-  //     initialDate: _selectedDate,
-  //     firstDate: DateTime.now(),
-  //     lastDate: DateTime(2100),
-  //   );
-  //   if (pickedDate != null && pickedDate != _selectedDate) {
-  //     setState(() {
-  //       _selectedDate = pickedDate;
-  //       _dateController.text =
-  //           '${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}';
-  //     });
-  //   }
-  // }
-
-  // Future<void> _selectTime(BuildContext context) async {
-  //   final TimeOfDay? pickedTime = await showTimePicker(
-  //     context: context,
-  //     initialTime: _selectedTime,
-  //   );
-  //   if (pickedTime != null && pickedTime != _selectedTime) {
-  //     setState(() {
-  //       _selectedTime = pickedTime;
-  //       _timeController.text = '${_selectedTime.hour}:${_selectedTime.minute}';
-  //     });
-  //   }
-  // }
-  Future<void> _selectDate(BuildContext context) async {
+  
+  Future<void> _selectionnerDate(BuildContext context) async {
     final ThemeData theme = Theme.of(context).copyWith(
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: Colors.deepPurple,
@@ -126,7 +97,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
     }
   }
 
-  Future<void> _selectTime(BuildContext context) async {
+  Future<void> _selectionnerTemps(BuildContext context) async {
     final ThemeData theme = Theme.of(context).copyWith(
       colorScheme: ColorScheme.fromSwatch(
         primarySwatch: Colors.deepPurple,
@@ -149,10 +120,9 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
     }
   }
 
-  String? selectedValue;
+  String? compteSelectionne;
 
   Future<void> ajouterRevenu(DateTime date, 
-  // TimeOfDay time, 
   String category,
       double montant, String compte) async {
     final eventDoc = FirebaseFirestore.instance.collection("transaction").doc();
@@ -163,7 +133,7 @@ class _AjouterRevenuState extends State<AjouterRevenu> {
       // 'time': time,
       'category': category,
       'compte': compte,
-      'email': userEmail,
+      'email': emailUtilisateur,
       'type': 'revenu'
     };
     await eventDoc.set(donneesRevenu);
@@ -175,7 +145,7 @@ bool chargement = false;
   void onPressedD(BuildContext context) async {
   final montant = _montantController.text.trim();
   final categorie = _categoryController.text.trim();
-  final compte = selectedValue.toString();
+  final compte = compteSelectionne.toString();
   final heure = _selectedTime.toString();
   final date = _selectedDate.toString();
 setState(() {
@@ -191,7 +161,7 @@ setState(() {
         // 'time': _selectedTime,
         'category': categorie,
         'compte': compte,
-        'email': userEmail,
+        'email': emailUtilisateur,
         "type": "revenu"
       };
 
@@ -219,16 +189,16 @@ setState(() {
     });
   }
 
-  print("$montant, $categorie, $compte, $heure, $date? $documentId, userEmail: $userEmail");
+  print("$montant, $categorie, $compte, $heure, $date? $documentId, emailUtilisateur: $emailUtilisateur");
 }
 //!
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: vertBackground,
+      backgroundColor: blancBackground,
       appBar: AppBar(
-        backgroundColor: vertBackground,
+        backgroundColor: blancBackground,
         title: Text("Revenu"),
       ),
       body: Padding(
@@ -247,7 +217,7 @@ setState(() {
                   ),
                   GestureDetector(
                     onTap: () {
-                      _selectDate(context);
+                      _selectionnerDate(context);
                     },
                     child: Container(
                         width: 110,
@@ -276,7 +246,7 @@ setState(() {
                   ),
                   GestureDetector(
                     onTap: () {
-                      _selectTime(context);
+                      _selectionnerTemps(context);
                     },
                     child: Container(
                         width: 110,
@@ -349,7 +319,7 @@ setState(() {
                   ),
                   GestureDetector(
                       onTap: () {
-                        _showOptionsBottomSheet(context);
+                        _montrerOptionsBottomSheet(context);
                       },
                       child: Container(
                           height: 50,
@@ -381,21 +351,21 @@ setState(() {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedValue = 'compte';
+                        compteSelectionne = 'compte';
                       });
                     },
                     child: Container(
                       padding: EdgeInsets.all(8),
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: selectedValue == 'compte' ? vert : Colors.white,
+                        color: compteSelectionne == 'compte' ? vert : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Compte',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selectedValue == 'compte'
+                          color: compteSelectionne == 'compte'
                               ? Colors.white
                               : Colors.black,
                         ),
@@ -405,21 +375,21 @@ setState(() {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedValue = 'cash';
+                        compteSelectionne = 'cash';
                       });
                     },
                     child: Container(
                       padding: EdgeInsets.all(8),
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: selectedValue == 'cash' ? vert : Colors.white,
+                        color: compteSelectionne == 'cash' ? vert : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Cash',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selectedValue == 'cash'
+                          color: compteSelectionne == 'cash'
                               ? Colors.white
                               : Colors.black,
                         ),
@@ -429,21 +399,21 @@ setState(() {
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        selectedValue = 'carte';
+                        compteSelectionne = 'carte';
                       });
                     },
                     child: Container(
                       padding: EdgeInsets.all(8),
                       margin: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                       decoration: BoxDecoration(
-                        color: selectedValue == 'carte' ? vert : Colors.white,
+                        color: compteSelectionne == 'carte' ? vert : Colors.white,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Carte',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: selectedValue == 'carte'
+                          color: compteSelectionne == 'carte'
                               ? Colors.white
                               : Colors.black,
                         ),
@@ -463,51 +433,10 @@ setState(() {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  // onPressed: () async {
-                  //   final montant = _montantController.text.trim();
-                  //   final categorie = _categoryController.text.trim();
-                  //   final compte = selectedValue.toString();
-                  //   final heure = _selectedTime.toString();
-                  //   final date = _selectedDate.toString();
-
-                  //   try {
-                  //     if (montant.isNotEmpty &&
-                  //         date.isNotEmpty &&
-                  //         heure.isNotEmpty &&
-                  //         categorie.isNotEmpty &&
-                  //         compte.isNotEmpty) {
-                  //       await ajouterRevenu(DateTime.parse(date), 
-                  //           // _selectedTime,
-                  //           categorie, double.parse(montant), compte,
-                  //           // _selectedDate ,
-                  //           // _selectedTime,
-                           
-                           
-                  //           );
-                  //     } else if (date.isEmpty) {
-                  //       montrerSnackBar("Veuillez renseigner la date", context);
-                  //     } else if (heure.isEmpty) {
-                  //       montrerSnackBar("Veuillez renseigner l'heure", context);
-                  //     } else if (montant.isEmpty) {
-                  //       montrerSnackBar(
-                  //           "Veuillez renseigner le montant", context);
-                  //     } else if (categorie.isEmpty) {
-                  //       montrerSnackBar(
-                  //           "Veuillez renseigner la catégorie", context);
-                  //     } else if (compte.isEmpty) {
-                  //       montrerSnackBar(
-                  //           "Veuillez renseigner le compte", context);
-                  //     }
-                  //   } catch (e) {
-                  //     montrerSnackBar("Une erreur est survenue :,", context);
-                  //   }
-                  //   print("$montant, $categorie, $compte, $heure, $_selectedTime, $date, $_selectedDate ");
-                  // },
+                 
                   onPressed: (){
                     onPressedD(context);},
-                  // onPressed: () async {
-                  //   print("ok");
-                  // },
+                  
                   child: Text(
                     "Ajouter",
                     style: TextStyle(color: Colors.white, fontSize: 20),

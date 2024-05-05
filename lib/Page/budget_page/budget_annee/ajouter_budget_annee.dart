@@ -4,7 +4,6 @@ import 'package:budget_odc/widgets/message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class AjouterAnnee extends StatefulWidget {
   const AjouterAnnee({super.key});
@@ -23,11 +22,11 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
   DateTimeRange plageChoisi =
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
 
-  String? userEmail = "";
+  String? emailUtilisateur = "";
   bool chargement = false;
   @override
   void initState() {
-    userEmail = FirebaseAuth.instance.currentUser?.email;
+    emailUtilisateur = FirebaseAuth.instance.currentUser?.email;
     _descriptionDesCategories = [];
     _montantDeCategorie = [];
 
@@ -48,9 +47,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
   }
 
   void ajouterBudget(BuildContext context) async {
-    // final nobreCat = _nombreDeCategorieController.text.trim();
-    // final description = _descriptionDesCategories;
-    // final montant = _montantDeCategorie;
+    
     final titre = _titreController.text.trim();
     final nobreCat =
         int.tryParse(_nombreDeCategorieController.text.trim()) ?? 0;
@@ -88,7 +85,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
           'descriptions': description,
           'nombre': nobreCat,
           'montants': montant,
-          'email': userEmail,
+          'email': emailUtilisateur,
           'type': 'annee',
         };
         print("Nombre de descriptions: ${description.length}");
@@ -99,7 +96,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
         // Récupérer l'ID du document ajouté
         final documentId = eventDoc.id;
         print("Document ajouté avec l'ID: $documentId");
-
+        // retoure à l'autre ecran
         Navigator.pop(context);
         montrerSnackBar("Budget ajouté avec succès", context);
 
@@ -123,7 +120,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
     setState(() {
       chargement = false;
     });
-    print("$montant, $nobreCat, userEmail: $userEmail");
+    print("$montant, $nobreCat, emailUtilisateur: $emailUtilisateur");
   }
 
   @override
@@ -139,6 +136,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
                 color: vert, borderRadius: BorderRadius.circular(50)),
             child: TextButton(
                 onPressed: () async {
+                  // afficher le selecteur de date
                   final DateTimeRange? plageDate = await showDateRangePicker(
                       helpText: "selectionnez une plage de 365 jours",
                       cancelText: "Quitter",
@@ -164,7 +162,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
           ),
         ],
         title: Text(
-          "Budget Annuel", //style: TextStyle(fontSize: 13),
+          "Budget Annuel", 
         ),
       ),
       body: ListView(
@@ -190,11 +188,7 @@ class _AjouterAnneeState extends State<AjouterAnnee> {
                   keyboardType: TextInputType.number,
                   controller: _titreController,
                   cursorColor: vert,
-                  // onChanged: (value) {
-                  //   setState(() {
-                  //     _nombreDeCategories = int.tryParse(value) ?? 0;
-                  //   });
-                  // },
+                  
                 ),
               ),
               SizedBox(

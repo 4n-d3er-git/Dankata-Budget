@@ -1,7 +1,7 @@
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:flutter/material.dart';
 
-// creat a custom snackbar
+// creer un snackBar personnalisé
 
 montrerSnackBar(String contenu,  BuildContext context,){
   ScaffoldMessenger.of(context).showSnackBar(

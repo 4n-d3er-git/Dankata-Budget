@@ -1,6 +1,5 @@
 
 import 'package:budget_odc/Page/auth_Page/mot_de_passs_oublie.dart';
-import 'package:budget_odc/Page/home_Page/home_page.dart';
 import 'package:budget_odc/theme/couleur.dart';
 import 'package:budget_odc/widgets/bottomnevbar.dart';
 import 'package:budget_odc/widgets/chargement.dart';
@@ -18,12 +17,14 @@ class Connexion extends StatefulWidget {
 }
 
 class _ConnexionState extends State<Connexion> {
+  // les controlleurs pour les champs de saisie
   TextEditingController emailController = TextEditingController();
   TextEditingController motDePasseController = TextEditingController();
   final formKey = GlobalKey<FormState>();
+  // le chargement
   bool chargement = false;
-  // FirebaseAuth instance
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+// fonction de connexion
   void connexion() async {
     final email = emailController.text.trim();
     final password = motDePasseController.text.trim();
@@ -36,17 +37,18 @@ class _ConnexionState extends State<Connexion> {
       });
         await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
-        // await storeUserType('host');
-        // ignore: use_build_context_synchronously
          // Stockage de l'état de connexion dans SharedPreferences
+         //cache
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setBool('isLoggedIn', true);
+        // naviguer vers la page principale
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
           return const BottomNavBar();
         }));
         montrerSnackBar("Content de vous revoir", context);
         emailController.clear();
         motDePasseController.clear();
+        // les exceptions
       } on FirebaseAuthException catch (e) {
         // print(e.code);
         if (e.code == "user-not-found") {
@@ -96,7 +98,7 @@ class _ConnexionState extends State<Connexion> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: vertBackground,
+      backgroundColor: blancBackground,
       body: SafeArea(
           child: Padding(
               padding: EdgeInsets.all(8),
@@ -170,6 +172,7 @@ class _ConnexionState extends State<Connexion> {
                                 SizedBox(
                                   height: 15,
                                 ),
+                                // faire le chargement pendant l'envoie de donnees
                                 chargement ? ChargementWidget():
                                 MaterialButton(
                                     height: 50,
@@ -179,6 +182,7 @@ class _ConnexionState extends State<Connexion> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     onPressed: () {
+                                      // declencher la connexion si tous les champs sont saisi
                                       if (formKey.currentState!.validate()) {
                                         connexion();
                                       } else {}

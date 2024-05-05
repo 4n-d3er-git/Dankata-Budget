@@ -26,49 +26,62 @@ class _BudgetPageState extends State<BudgetPage>
     _controller.dispose();
     super.dispose();
   }
-DateTimeRange plageChoisi =
+
+  DateTimeRange plageChoisi =
       DateTimeRange(start: DateTime.now(), end: DateTime.now());
   @override
   Widget build(BuildContext context) {
-    return  DefaultTabController(
+    return DefaultTabController(
       length: 3,
       child: Scaffold(
-        appBar: AppBar(title: Text("Gestion de Budgets",),  
-        bottom: PreferredSize(preferredSize: Size.fromHeight(40), child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          child: Container(
-            height: 40, 
-            padding: EdgeInsets.symmetric(vertical: 4, horizontal: 3),
-            margin: EdgeInsets.symmetric(horizontal: 10), 
-            decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10), )
-            ,color: vertClaire,
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            title: Text(
+              "Gestion de Budgets",
             ),
-            child: TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              dividerColor: Colors.transparent,
-              indicator: BoxDecoration(
-                color: Colors.white, 
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-              ),
-              labelColor: noir, 
-              unselectedLabelColor: noir,
-              labelStyle: TextStyle(fontWeight: FontWeight.bold),
-              tabs: [ 
-                Tab(text: "Semaine",), 
-                Tab(text: "Mois",), 
-                Tab(text: "Année",)
-                
-              ]),
+            bottom: PreferredSize(
+                preferredSize: Size.fromHeight(40),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  child: Container(
+                    height: 40,
+                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 3),
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(10),
+                      ),
+                      color: vertClaire,
+                    ),
+                    child: TabBar(
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        dividerColor: Colors.transparent,
+                        indicator: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        labelColor: noir,
+                        unselectedLabelColor: noir,
+                        labelStyle: TextStyle(fontWeight: FontWeight.bold),
+                        tabs: [
+                          Tab(
+                            text: "Semaine",
+                          ),
+                          Tab(
+                            text: "Mois",
+                          ),
+                          Tab(
+                            text: "Année",
+                          )
+                        ]),
+                  ),
+                )),
           ),
-        )),
-        
-        ),
-        body: TabBarView(children: [ 
-          BudgetSemaine(),
-          BudgetMois(),
-          BudgetAnne(),
-        ])
-      ),
+          body: TabBarView(children: [
+            BudgetSemaine(),
+            BudgetMois(),
+            BudgetAnne(),
+          ])),
     );
   }
 }

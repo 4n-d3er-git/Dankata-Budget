@@ -10,28 +10,28 @@ class OnBoardingPage extends StatefulWidget {
 }
 
 class _OnBoardingPageState extends State<OnBoardingPage> {
-  int currentIndex = 0;
+  int indexCourrent = 0;
 
-  List<Map<String, String>> items = [   
+  List<Map<String, String>> elements = [   
     {
       "titre": "Commencez avec la",
-      "sousTitre": "Budgetisateion Basée sur le Revenu",
-      "description": "Une methode de gestion de vos finances en organisant vos dépensen en catégories spécifiqueq.",
+      "sousTitre": "Budgetisateion Basée sur le Revenu.",
+      "description": "Une methode de gestion de vos finances en organisant vos dépensen en catégories spécifiques.",
       "image": "assets/images/on1.png",
     },
     {
       "titre": "Continuez à mettre à jour vos revenus",
-      "sousTitre": "avec un budget avantageux",
+      "sousTitre": "avec un budget avantageux.",
       "description": "La mise en oeuvre de stratégies respectueuses du budget, vous pouvez tirer le meilleur"
       " parti de vos resources financières et atteindre vos obgetifs financières plus facilement.",
       "image": "assets/images/on3.png",
     },
     {
-      "titre": "Continuze à mettre à jour vos dépenses",
-      "sousTitre": "avec notre applications",
+      "titre": "Continuze à mettre à jour vos dépenses avec",
+      "sousTitre": " DankataBudget",
       "description": "En examinant et en optimisant régulièrement vos dépenses, vous pouvez vous assurer."
       "que vous tirez le meilleur parti de vos ressources financières et que  vous restez sur la bonne voie avec"
-      "vos style de vie repectueux de votre budget.",
+      "vos styles de vie repectueux de votre budget.",
       "image": "assets/images/on2.png",
     },
   ];
@@ -56,16 +56,16 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                     controller: _pageController,
                     onPageChanged: (value) {
                       setState(() {
-                        currentIndex = value;
+                        indexCourrent = value;
                         dernierePage = (value ==2);
                       });
                     },
-                    itemCount: items.length,
+                    itemCount: elements.length,
                     itemBuilder: (context, index) => OnBoardingState(
-                      titre: items[index]["titre"].toString(),
-                      sousTitre: items[index]["sousTitre"].toString(),
-                      description: items[index]["description"].toString(),
-                      image: items[index]["image"].toString(),
+                      titre: elements[index]["titre"].toString(),
+                      sousTitre: elements[index]["sousTitre"].toString(),
+                      description: elements[index]["description"].toString(),
+                      image: elements[index]["image"].toString(),
                     ),
                   ),
                 ),
@@ -77,9 +77,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: List.generate(
-                          items.length,
-                          (index) => OnBoardingDot(
-                              index: index, currentIndex: currentIndex),
+                          elements.length,
+                          (index) => onBoardingDot(
+                              index: index, indexCourrent: indexCourrent),
                         ),
                       ),
                       SizedBox(height: 15,),
