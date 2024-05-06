@@ -82,7 +82,7 @@ class _InscriptionState extends State<Inscription> {
             .pushReplacement(MaterialPageRoute(builder: (context) {
           return BottomNavBar();
         }));
-        montrerSnackBar("Bienveu dans ...", context);
+        montrerSnackBar("Bienvenu dans Dankata Budget !", context);
         _nomCompletController.clear();
         _emailController.clear();
         _telephoneController.clear();
@@ -166,7 +166,7 @@ class _InscriptionState extends State<Inscription> {
                         ),
                       ),
                       Text(
-                        "Creez votre compte avec...",
+                        "Créez votre compte Dankata Budget.",
                         style: TextStyle(color: gris),
                       ),
                       Padding(

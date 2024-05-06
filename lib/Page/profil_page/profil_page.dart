@@ -6,7 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class ProfilPage extends StatefulWidget {
   const ProfilPage({super.key});
 
@@ -29,8 +29,8 @@ class _ProfilPageState extends State<ProfilPage> {
       prefs.remove('isLoggedIn');
       print("Déconnecté");
       // Naviguer vers la LoginPage
-      Navigator.pushReplacement(
-        context,
+      Navigator.of(context).pushReplacement(
+        
         MaterialPageRoute(builder: (context) => OnBoardingPage()),
       );
     } catch (e) {
@@ -42,6 +42,12 @@ class _ProfilPageState extends State<ProfilPage> {
   }
 
   String? emailUtilisateur = FirebaseAuth.instance.currentUser!.email;
+  Future<void> _ouvrirLeSite(Uri url) async {
+    final Uri url = Uri.parse("https://www.moneyvox.fr/votre-argent/actualites/96856/gestion-de-budget-les-7-etapes-a-suivre-pour-ameliorer-votre-equilibre-financier");
+    if(!await launchUrl(url)){
+      throw montrerErreurSnackBar("Impossible d'ouvrir le lien, veuillez réessayer", context);
+    }
+  }
 
   void conseilDialog() {
     showDialog(
@@ -67,7 +73,10 @@ class _ProfilPageState extends State<ProfilPage> {
                 'OK',
                 style: TextStyle(color: Colors.green),
               ),
-              onPressed: () {},
+              onPressed: () {
+                //Naviguer vers le site web de conseils
+                _ouvrirLeSite( Uri.parse("https://www.moneyvox.fr/votre-argent/actualites/96856/gestion-de-budget-les-7-etapes-a-suivre-pour-ameliorer-votre-equilibre-financier"));
+              },
             ),
           ],
         );

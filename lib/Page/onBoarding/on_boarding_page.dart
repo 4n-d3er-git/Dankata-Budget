@@ -16,7 +16,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     {
       "titre": "Commencez avec la",
       "sousTitre": "Budgetisateion Basée sur le Revenu.",
-      "description": "Une methode de gestion de vos finances en organisant vos dépensen en catégories spécifiques.",
+      "description": "Une méthode de gestion de vos finances en organisant vos dépenses en catégories spécifiques.",
       "image": "assets/images/on1.png",
     },
     {
@@ -27,7 +27,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
       "image": "assets/images/on3.png",
     },
     {
-      "titre": "Continuze à mettre à jour vos dépenses avec",
+      "titre": "Continuez à mettre à jour vos dépenses avec",
       "sousTitre": " DankataBudget",
       "description": "En examinant et en optimisant régulièrement vos dépenses, vous pouvez vous assurer."
       "que vous tirez le meilleur parti de vos ressources financières et que  vous restez sur la bonne voie avec"

@@ -43,26 +43,27 @@ class ProjetApp extends StatelessWidget {
                 return MaterialApp(
                  debugShowCheckedModeBanner: false,
                   home: 
-                  // SplashScreen(),
-                  Scaffold(
-                body: Center(
-                          child: Text(
-                        "Dankata Budget",
-                        style: TextStyle(color: vert, fontSize: 30),
-                      ))),
+                  SplashScreen(),
+                //   Scaffold(
+                // body: Center(
+                //           child: Text(
+                //         "Dankata Budget",
+                //         style: TextStyle(color: vert, fontSize: 30),
+                //       ))),
                 );
               } else {
                 if (snapshot.data == true) {
                   return MaterialApp(
                     debugShowCheckedModeBanner: false,
                     title: "Dankata Budget",
-                    // home: SplashScreen(),
-                   home: BottomNavBar(),
+                    home: SplashScreen(),
+                  //  home: BottomNavBar(),
                   );
                 } else {
                   return MaterialApp(
                     debugShowCheckedModeBanner: false,
-                    home: OnBoardingPage(),
+                    home: SplashScreen(),
+                    // home: OnBoardingPage(),
                   );
                 }
               }
@@ -72,13 +73,13 @@ class ProjetApp extends StatelessWidget {
           return  MaterialApp(
             debugShowCheckedModeBanner: false,
                   home: 
-                  // SplashScreen(),
-                  Scaffold(
-                body: Center(
-                    child: Text(
-                  "Dankata Budget",
-                  style: TextStyle(color: vert, fontSize: 30),
-                ))),
+                  SplashScreen(),
+                //   Scaffold(
+                // body: Center(
+                //     child: Text(
+                //   "Dankata Budget",
+                //   style: TextStyle(color: vert, fontSize: 30),
+                // ))),
           );
         }
       },

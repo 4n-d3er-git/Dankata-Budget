@@ -46,10 +46,16 @@ User? firebaseUtilisateur = FirebaseAuth.instance.currentUser;
         } else {
           premierWidget = OnBoardingPage();
         }
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => premierWidget),
-        );
+        if (mounted) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => premierWidget),
+  );
+}
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => premierWidget),
+        // );
       }
       
     
@@ -72,11 +78,8 @@ User? firebaseUtilisateur = FirebaseAuth.instance.currentUser;
                 ),
               )
             : Center(
-                    child: Text(
-                  "Dankata Budget",
-                  style: TextStyle(color: vert, fontSize: 30),
-                ))
-      ),
+                    child: Image.asset("assets/db.png", fit: BoxFit.cover,),
+      ),)
     );
   }
 }

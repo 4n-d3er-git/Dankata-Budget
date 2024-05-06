@@ -45,7 +45,7 @@ class _ConnexionState extends State<Connexion> {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
           return const BottomNavBar();
         }));
-        montrerSnackBar("Content de vous revoir", context);
+        montrerSnackBar("Content de vous revoir !", context);
         emailController.clear();
         motDePasseController.clear();
         // les exceptions
@@ -116,7 +116,7 @@ class _ConnexionState extends State<Connexion> {
                         ),
                       ),
                       Text(
-                        "Connectez-vous avec...",
+                        "Connectez-vous à Dankata Budget.",
                         style: TextStyle(color: gris),
                       ),
                       Padding(

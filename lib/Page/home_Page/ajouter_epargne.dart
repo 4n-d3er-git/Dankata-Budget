@@ -126,6 +126,7 @@ bool chargement = false;
                         hintStyle: TextStyle(),
                         hintText: "Montant",
                       ),
+                      keyboardType: TextInputType.number,
                       controller: _montantController,
                     ),
                   ),

@@ -126,7 +126,7 @@ setState(() {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 4),
             height: 35,
-            width: 35,
+            width: 50,
             decoration: BoxDecoration(
                 color: vert, borderRadius: BorderRadius.circular(50)),
             child: TextButton(
@@ -180,7 +180,6 @@ setState(() {
                           hintStyle: TextStyle(
                             fontSize: 10,
                           )),
-                      keyboardType: TextInputType.number,
                       controller: _titreController,
                       cursorColor: vert,
                       
@@ -199,7 +198,7 @@ setState(() {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          hintText: "Nombre de catégorie",
+                          hintText: "Nombre de descriptions",
                           hintStyle: TextStyle(
                             fontSize: 12,
                           )),
@@ -227,7 +226,7 @@ setState(() {
                       setState(() {
                         if (_nombreDeCategorieController.text.isEmpty) {
                           montrerSnackBar(
-                              "veuillez entrer le nombre de catégorie",
+                              "veuillez entrer le Nombre de descriptions",
                               context);
                         }
                       });
@@ -272,7 +271,7 @@ setState(() {
                               decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10)),
-                                  hintText: "Catégorie"),
+                                  hintText: "Description"),
                             ))
                       ],
                     ),
@@ -293,7 +292,7 @@ setState(() {
                   onPressed: () {
                     if (_nombreDeCategorieController.text.isEmpty) { 
                       montrerErreurSnackBar(
-                          "veuillez entrer le nombre de catégorie", context);
+                          "veuillez entrer le Nombre de descriptions", context);
                     } else if (_descriptionDesCategories.isEmpty) {
                       montrerErreurSnackBar(
                           "veuillez appuiyer sur OK puis remplir tous les champs",

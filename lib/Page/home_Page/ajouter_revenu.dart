@@ -301,6 +301,7 @@ setState(() {
                         hintStyle: TextStyle(),
                         hintText: "Montant",
                       ),
+                      keyboardType: TextInputType.number,
                     ),
                   ),
                 ],

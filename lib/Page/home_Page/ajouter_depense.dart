@@ -259,6 +259,7 @@ chargement = true;
                         hintStyle: TextStyle(),
                         hintText: "Montant",
                       ),
+                      keyboardType: TextInputType.number,
                       controller: _montantController,
                     ),
                   ),
