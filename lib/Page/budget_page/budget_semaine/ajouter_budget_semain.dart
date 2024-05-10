@@ -223,7 +223,7 @@ setState(() {
 
                       setState(() {
                         if (_nombreDeCategorieController.text.isEmpty) {
-                          montrerSnackBar(
+                          montrerErreurSnackBar(
                               "veuillez entrer le nombre de descriptions",
                               context);
                         }
@@ -288,7 +288,10 @@ setState(() {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   onPressed: () {
-                    if (_nombreDeCategorieController.text.isEmpty) { 
+                    if(_titreController.text.isEmpty){
+                      montrerErreurSnackBar("veuillez entrer un titre", context);
+                    }
+                    else if (_nombreDeCategorieController.text.isEmpty) { 
                       montrerErreurSnackBar(
                           "veuillez entrer le nombre de description", context);
                     } else if (_descriptionDesCategories.isEmpty) {

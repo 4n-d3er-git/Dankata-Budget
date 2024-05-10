@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     _controlleur = VideoPlayerController.asset(
-      'assets/dankata.mp4',
+      'assets/DB.mp4',
     )
       ..initialize().then((_) {
         setState(() {});
